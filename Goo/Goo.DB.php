@@ -438,22 +438,40 @@ class GooDBTable
 	}
 	
 	/****************************************************************************************************
-	 * Creates a new table
+	 * Creates a new table.
+	 * This function is a simple way to create standard tables. To create more complex tables use
+	 * a direct query using the DB goo.
 	 *
-	 * @param	fields sql string
+	 * @param	fields sql array
 	 * @param	primary key field name
 	 * @return	boolean true on success
 	 */
-	function create($fields, $primarykey)
+	function create($array)
 	{
 		$out = false;
 		
 		if (!in_array($this->name, $this->db->getTables()))
 		{
+			// ****** Prepare
+			$fields = array();
+			foreach ($array as $name => $value)
+			{
+				if ($value == 'key' || $value == 'KEY')
+				{
+					$fields[] = '`' . $name . '` INT UNSIGNED NOT NULL AUTO_INCREMENT';
+					$primarykey = $name;
+				}
+				else
+				{
+					$fields[] = '`' . $name . '` ' . $value . ' NOT NULL';
+				}
+			}
+			
+			// ****** Create
 			$query = '
 				CREATE 
 				TABLE `' . $this->name . '` (
-					' . $fields . ',
+					' . join(', ', $fields) . ',
 				PRIMARY KEY (`' . $primarykey . '`)
 				);';
 		

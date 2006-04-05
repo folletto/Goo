@@ -60,7 +60,7 @@ if ($dbTest->count() < 2)
 	$dbTest->set(false, array('Title' => 'Jarre Docet', 'Content' => 'He does too.', 'HowMuch' => '9'));
 }
 
-$items = $dbTest->get(true);
+$items = $dbTest->get(true, 'HowMuch DESC');
 
 $g->gooTemplate->render('template', $items);
 

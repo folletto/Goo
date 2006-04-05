@@ -379,19 +379,22 @@ class GooDBTable
 	 * Get an array of rows from the database table.
 	 *
 	 * @param	where condition
+	 * @param	string of order bys
 	 * @param	optional limit condition (i.e. '0,25', '25,50', ...)
 	 * @return	array of rows (boolean false on failure)
 	 */
-	function get($where, $limit = '')
+	function get($where, $order = '', $limit = '')
 	{
 		$out = false;
 		
 		if ($limit) $limit = 'LIMIT ' . $limit;
+		if ($order) $order = 'ORDER BY ' . $order;
 		
 		$query = '
 			SELECT *
 			FROM ' . $this->name . '
 			WHERE ' . $where . '
+			' . $order . '
 			' . $limit . '
 			;';
 		

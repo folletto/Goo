@@ -30,8 +30,10 @@
 
 class GooTemplate extends Goo
 {
-	var $name	= '';		// template name (path)
-	var $count	= 0;		// count template renders
+	var $name	= '';			// template name (path)
+	var $count	= 0;			// count template renders
+	
+	var $partials = array();	// partials array
 	
 	/****************************************************************************************************
 	 * Constructor
@@ -41,10 +43,97 @@ class GooTemplate extends Goo
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
+		if (strrpos($template, '/') + 1  != strlen($template))
+			$template .= '/';
+		
 		$this->name = $template;
+		$this->partials = $this->read($template);
 		
 		// ****** Buffering
 		ob_start();
+	}
+	
+	/****************************************************************************************************
+	 * Read all the template files.
+	 * This function imports into an array all the files and their partials.
+	 * Reads JUST the files in the template folder that match this syntax: tpl.*.php
+	 *
+	 * @param	template folder
+	 * @return	array-ized partials ('partial' => 'template block')
+	 */
+	function read($template)
+	{
+		$out = array();
+		
+		if (is_dir($template))
+		{
+			// ****** Read template directory
+			if ($hdir = @opendir($template))
+			{
+				while (($file = readdir($hdir)) !== false)
+				{
+					if (strpos($file, 'tpl.') === 0)
+					{
+						$content = file_get_contents($template . $file); // PHP4.3+
+						
+						//preg_match_all('/:(\w+).*\n+(.|\n)*\n:end\n/i', $content, $matches, PREG_SET_ORDER);
+						$matches = $this->readPartials($content);
+						$out = array_merge($out, $matches);
+					}
+				}
+				
+				@closedir($hdir);
+			}
+		}
+		
+		return $out;
+	}
+	
+	/****************************************************************************************************
+	 * Read the string and convert its content into a partials template array
+	 *
+	 * @param	text string
+	 * @return	array-ized partials ('partial' => 'template block')
+	 */
+	function readPartials($string)
+	{
+		$out = array();
+		
+		$partial_name = null;
+		$partial_content = '';
+		
+		$lines = preg_split('/\n/', $string);
+		
+		foreach ($lines as $line)
+		{
+			if (preg_match('/^:(\w+)\s*.*$/i', $line, $matches) > 0)
+			{
+				// ****** Partial
+				// *** Close old partial
+				if ($partial_name !== null)
+				{
+					$out[$partial_name] = $partial_content;
+					$partial_content = "";
+				}
+				
+				// *** Start new partial
+				$partial_name = $matches[1];
+			}
+			else
+			{
+				// ****** Fill content
+				if ($partial_name !== null && $line !== '')
+					$partial_content .= $line . "\n";
+			}
+		}
+		
+		// *** Close last partial
+		if ($partial_name !== null)
+		{
+			$out[$partial_name] = $partial_content;
+		}
+		
+		return $out;
 	}
 	
 	/****************************************************************************************************
@@ -56,10 +145,50 @@ class GooTemplate extends Goo
 	 * @param	template part
 	 * @param	array to be inserted
 	 */
-	function render($part, $array = null)
+	function render($partial, $array = null)
 	{
 		$this->count++;
-		$filename = $this->name . '/' . $part . '.php';
+		$filename = $this->name . 'tpl.' . $partial . '.php';
+		
+		if (is_array($array))
+		{
+			if (isset($array[0]) && is_array($array[0]))
+			{
+				// ****** Bidimensional
+				foreach ($array as $item)
+				{
+					extract($item);
+					$code = $this->partials[$partial];
+					$code = str_replace('<' . '?php', '<' . '?', $code);
+					$code = '?' . '>'. $code . '<' . '?';
+					eval($code);
+				}
+			}
+			else
+			{
+				// ****** Monodimensional
+				extract($array);
+				$code = $this->partials[$partial];
+				$code = str_replace('<' . '?php', '<' . '?', $code);
+				$code = '?' . '>'. $code . '<' . '?';
+				eval($code);
+			}
+		}
+	}
+	
+	/****************************************************************************************************
+	 * Render a template file.
+	 * The array can be uni- or bi-dimensional.
+	 * If it's uni-, its values will be converted into variables and passed to the template.
+	 * If it's bi-, for each of its values will be executed the step above.
+	 *
+	 * @param	template filename
+	 * @param	array to be inserted
+	 */
+	function renderFile($file, $array = null)
+	{
+		$this->count++;
+		$filename = $this->name . 'tpl.' . $partial . '.php';
 		
 		if (is_array($array))
 		{

@@ -1,4 +1,6 @@
 
-:layout
-	<h2><?php echo $Title; ?></h2>
-	<p><?php echo $Content; ?> <strong>One more kiss, dear. One more time.</strong> (<?php echo $HowMuch; ?>)</p>
+:header
+	<h1>Goo Workbench</h1>
+	<p>Goo stands for Golem Objects. It is a lightweight extensible framework oriented to be
+		very easy to implement. It's designed to be used by developers with ease. Basically,
+		it's a glue between factory classes.</p>

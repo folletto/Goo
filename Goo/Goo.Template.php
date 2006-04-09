@@ -181,8 +181,11 @@ class GooTemplate extends Goo
 		extract($item);
 		
 		// *** Evaluates the string
+		// adding a intermediate 'smart variables' parser
+		$code = preg_replace('/\<\$(\w+)\>/', '<?php echo \$$1; ?>', $this->partials[$partial]);
+		
 		// partials are HTML mainly, so we close the php tags before evaluating.
-		eval(' ?' . '>' . $this->partials[$partial] . '<' . '?php ');
+		eval(' ?' . '>' . $code . '<' . '?php ');
 	}
 	
 	/****************************************************************************************************

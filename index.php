@@ -63,7 +63,8 @@ if ($dbTest->count() < 2)
 
 $items = $dbTest->get(true, 'HowMuch DESC');
 
-$g->gooTemplate->render('layout', $items);
+$g->gooTemplate->render('header');
+$g->gooTemplate->render('items', $items);
 
 // ****** Filters example
 function filter($text)

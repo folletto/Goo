@@ -44,6 +44,7 @@ class GooContext
 	
 	var $env = array();		// environment variables array
 	var $goos = array();	// goos array
+	var $filters = array();	// filters array
 	
 	var $instanceBornAt;	// instance start time
 	
@@ -165,6 +166,52 @@ class GooContext
 	function getEnv($name)
 	{
 		return $this->env[$name];
+	}
+	
+	/****************************************************************************************************
+	 * Set a new filter pipeline.
+	 *
+	 * @param	name of the filter
+	 * @param	function reference
+	 * @param	optional position, must be int
+	 * @return	variable value
+	 */
+	function setFilter($filter, $fx, $position = false)
+	{
+		// ****** Prepare
+		if (!isset($this->filters[$filter]))
+			$this->filters[$filter] = array();
+		
+		// ****** Append or reposition/rewrite
+		if ($position === false)
+			$this->filters[$filter][] = $fx;
+		elseif (is_int($position))
+			$this->filters[$filter][$position] = $fx;
+		
+		// ****** Reorder
+		ksort($this->filters[$filter]);
+	}
+	
+	/****************************************************************************************************
+	 * Filter a stream of data.
+	 *
+	 * @param	name of the filter
+	 * @param	data stream
+	 * @return	variable value
+	 */
+	function filter($filter, $stream)
+	{
+		$out = $stream;
+		
+		if (isset($this->filters[$filter]) && is_array($this->filters[$filter]))
+		{
+			foreach ($this->filters[$filter] as $fx)
+			{
+				$out = $fx($out);
+			}
+		}
+		
+		return $out;
 	}
 	
 	/****************************************************************************************************

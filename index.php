@@ -39,6 +39,7 @@ $g = new GooContext(array(
 	'lol'		=> 'this will stay as env, goo doesn\'t exist'
 	));
 
+// ****** Database and Template Example
 $single = array('Title' => 'Vangelis Docet', 'Content' => 'This is some text.');
 $double = array(
 	array('Title' => 'Porcois', 'Content' => 'Bunch of text'),
@@ -64,7 +65,23 @@ $items = $dbTest->get(true, 'HowMuch DESC');
 
 $g->gooTemplate->render('template', $items);
 
+// ****** Filters example
+function filter($text)
+{
+	return '.: ' . $text . ' :.';
+}
 
+function refilter($text)
+{
+	return '<h3> ' . $text . ' </h3>';
+}
+
+$g->setFilter('test', 'filter');
+$g->setFilter('test', 'refilter');
+echo $g->filter('test', 'oh long john');
+
+
+// ****** Closing
 $g->_dbg($g->toString());
 $g->_dbg('generated in ' . $g->lifeTime(3) . ' sec with Goo');
 

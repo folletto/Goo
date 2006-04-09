@@ -142,13 +142,14 @@ class GooTemplate extends Goo
 	 * If it's uni-, its values will be converted into variables and passed to the template.
 	 * If it's bi-, for each of its values will be executed the step above.
 	 *
-	 * @param	template part
+	 * @param	template part name identifier
 	 * @param	array to be inserted
+	 * @param	render function name callback
 	 */
-	function render($partial, $array = null)
+	function render($partial, $array = null, $fx = 'Partial')
 	{
 		$this->count++;
-		$filename = $this->name . 'tpl.' . $partial . '.php';
+		$renderer = 'renderHelper' . $fx . '';
 		
 		if (is_array($array))
 		{
@@ -157,57 +158,47 @@ class GooTemplate extends Goo
 				// ****** Bidimensional
 				foreach ($array as $item)
 				{
-					extract($item);
-					$code = $this->partials[$partial];
-					$code = str_replace('<' . '?php', '<' . '?', $code);
-					$code = '?' . '>'. $code . '<' . '?';
-					eval($code);
+					$this->{$renderer}($partial, $item);
 				}
 			}
 			else
 			{
 				// ****** Monodimensional
-				extract($array);
-				$code = $this->partials[$partial];
-				$code = str_replace('<' . '?php', '<' . '?', $code);
-				$code = '?' . '>'. $code . '<' . '?';
-				eval($code);
+				$this->{$renderer}($partial, $item);
 			}
 		}
 	}
 	
 	/****************************************************************************************************
-	 * Render a template file.
-	 * The array can be uni- or bi-dimensional.
-	 * If it's uni-, its values will be converted into variables and passed to the template.
-	 * If it's bi-, for each of its values will be executed the step above.
-	 *
-	 * @param	template filename
-	 * @param	array to be inserted
+	 * Partials Array Renderer
+	 * Renderer for the render() loop.
+	 * 
+	 * @param	partial name
+	 * @param	item array
 	 */
-	function renderFile($file, $array = null)
+	function renderHelperPartial($partial, $item)
 	{
-		$this->count++;
-		$filename = $this->name . 'tpl.' . $partial . '.php';
+		extract($item);
 		
-		if (is_array($array))
-		{
-			if (isset($array[0]) && is_array($array[0]))
-			{
-				// ****** Bidimensional
-				foreach ($array as $item)
-				{
-					extract($item);
-					include $filename;
-				}
-			}
-			else
-			{
-				// ****** Monodimensional
-				extract($array);
-				include $filename;
-			}
-		}
+		// *** Evaluates the string
+		// partials are HTML mainly, so we close the php tags before evaluating.
+		eval(' ?' . '>' . $this->partials[$partial] . '<' . '?php ');
+	}
+	
+	/****************************************************************************************************
+	 * File Include Renderer
+	 * Renderer for the render() loop.
+	 * 
+	 * @param	partial name
+	 * @param	item array
+	 */
+	function renderHelperFile($partial, $item)
+	{
+		extract($item);
+		
+		// *** Include a file
+		$filename = $this->name . 'tpl.' . $partial . '.php';
+		include $filename;
 	}
 	
 	/****************************************************************************************************

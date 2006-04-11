@@ -1,30 +1,3 @@
-<html>
-<head>
-	<title>Goo Workbench</title>
-	
-<style type="text/css">
-
-body
-{
-	font-family: Helvetica, Arial, sans-serif;
-}
-
-hr
-{
-	border: 1px dotted #cccccc;
-}
-
-</style>
-</head>
-<body>
-
-<h1>Goo Workbench</h1>
-<p>Goo stands for Golem Objects. It is a lightweight extensible framework oriented to be
-	very easy to implement. It's designed to be used by developers with ease.
-	Basically, it's a glue between factory classes.</p>
-
-<hr/>
-
 <?php
 
 error_reporting(E_ALL);
@@ -38,6 +11,8 @@ $g = new GooContext(array(
 	'Template'	=> 'template/default',
 	'lol'		=> 'this will stay as env, goo doesn\'t exist'
 	));
+
+$g->gooTemplate->render('header');
 
 // ****** Database and Template Example
 $single = array('Title' => 'Vangelis Docet', 'Content' => 'This is some text.');
@@ -63,7 +38,6 @@ if ($dbTest->count() < 2)
 
 $items = $dbTest->get(true, 'HowMuch DESC');
 
-$g->gooTemplate->render('header');
 $g->gooTemplate->render('items', $items);
 
 // ****** Filters example
@@ -86,7 +60,5 @@ echo $g->filter('test', 'oh long john');
 $g->_dbg($g->toString());
 $g->_dbg('generated in ' . $g->lifeTime(3) . ' sec with Goo');
 
+$g->gooTemplate->render('footer');
 ?>
-
-</body>
-</html>

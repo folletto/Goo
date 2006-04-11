@@ -1,7 +1,7 @@
 <?php
 /*
  * Goo Template
- * version 0.1
+ * version 0.2
  * 
  * Copyright (C) 2006
  * by Davide S. Casali
@@ -138,13 +138,13 @@ class GooTemplate extends Goo
 	
 	/****************************************************************************************************
 	 * Render a template part.
-	 * The array can be uni- or bi-dimensional.
+	 * The array is optional and it can be uni- or bi-dimensional.
 	 * If it's uni-, its values will be converted into variables and passed to the template.
 	 * If it's bi-, for each of its values will be executed the step above.
 	 *
 	 * @param	template part name identifier
-	 * @param	array to be inserted
-	 * @param	render function name callback
+	 * @param	optional array to be inserted (uni/bi-dimensional)
+	 * @param	optional render function name callback (def: Partial) [Partial, File]
 	 */
 	function render($partial, $array = null, $fx = 'Partial')
 	{
@@ -164,8 +164,12 @@ class GooTemplate extends Goo
 			else
 			{
 				// ****** Monodimensional
-				$this->{$renderer}($partial, $item);
+				$this->{$renderer}($partial, $array);
 			}
+		}
+		else if ($array == null)
+		{
+			$this->{$renderer}($partial, array());
 		}
 	}
 	

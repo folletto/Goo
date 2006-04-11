@@ -1,4 +1,3 @@
-
 :partial
 	<blockquote>
 		<h3>Beh, funziona!</h3>

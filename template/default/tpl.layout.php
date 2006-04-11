@@ -7,23 +7,25 @@ Notes:
 
 
 :header ******************************************************************************************
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
 <head>
 	<title>Goo Workbench</title>
 	
-<style type="text/css">
+	<style type="text/css">
 
-body
-{
-	font-family: Helvetica, Arial, sans-serif;
-}
+	body
+	{
+		font-family: Helvetica, Arial, sans-serif;
+	}
 
-hr
-{
-	border: 1px dotted #cccccc;
-}
+	hr
+	{
+		border: 1px dotted #cccccc;
+	}
 
-</style>
+	</style>
 </head>
 <body>
 

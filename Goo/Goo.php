@@ -93,7 +93,8 @@ class GooContext
 	}
 	
 	/****************************************************************************************************
-	 * Goo plugging
+	 * Goo plugging.
+	 * Goo names MUST have the first letter uppercase.
 	 *
 	 * @param	goo file name (adds file: goo.name.php)
 	 */
@@ -101,25 +102,29 @@ class GooContext
 	{
 		$out = false;
 		
-		$filename = dirname(__FILE__) . '/goo.' . $name . '.php';
-		$classname = 'Goo' . $name;
-		
-		// ****** Creation
-		if ($name && file_exists($filename))
+		// Checks if the first letter is not a lowercase letter
+		if (!preg_match('/^[a-z]/', $name))
 		{
-			include_once $filename;
-			
-			// ****** Bind
-			$goo = new $classname($this, $params);
-			if (is_subclass_of($goo, 'Goo'))
+			$filename = dirname(__FILE__) . '/Goo.' . $name . '.php';
+			$classname = 'Goo' . $name;
+		
+			// ****** Creation
+			if ($name && file_exists($filename))
 			{
-				// ...to Array
-				$this->goos[$name] = &$goo;
-				// ...to gooObj
-				$this->{'goo' . $name} = &$this->goos[$name];
-			}
+				include_once $filename;
 			
-			$out = true;
+				// ****** Bind
+				$goo = new $classname($this, $params);
+				if (is_subclass_of($goo, 'Goo'))
+				{
+					// ...to Array
+					$this->goos[$name] = &$goo;
+					// ...to gooObj
+					$this->{$name} = &$this->goos[$name];
+				}
+			
+				$out = true;
+			}
 		}
 		
 		return $out;

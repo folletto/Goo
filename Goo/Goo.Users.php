@@ -40,7 +40,7 @@ class GooUsers extends Goo
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
-		$this->dbUsers = $context->gooDB->table($table);
+		$this->dbUsers = $context->DB->table($table);
 	}
 	
 	

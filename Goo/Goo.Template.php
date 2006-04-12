@@ -4,7 +4,7 @@
  * version 0.2
  * 
  * Copyright (C) 2006
- * by Davide S. Casali
+ * by Davide S. Casali, Alessandro Morandi
  * www.digitalhymn.com
  *
  * This is the template manager goo.
@@ -30,7 +30,7 @@
 
 class GooTemplate extends Goo
 {
-	var $name	= '';			// template name (path)
+	var $path	= '';			// template name (path)
 	var $count	= 0;			// count template renders
 	
 	var $partials = array();	// partials array
@@ -38,16 +38,15 @@ class GooTemplate extends Goo
 	/****************************************************************************************************
 	 * Constructor
 	 */
-	function GooTemplate($context, $template)
+	function GooTemplate($context, $path)
 	{
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
-		if (strrpos($template, '/') + 1  != strlen($template))
-			$template .= '/';
+		$path = trim($path, '/') . '/';
 		
-		$this->name = $template;
-		$this->partials = $this->read($template);
+		$this->path = $path;
+		$this->partials = $this->read($path);
 		
 		// ****** Buffering
 		ob_start();
@@ -204,7 +203,7 @@ class GooTemplate extends Goo
 		extract($item);
 		
 		// *** Include a file
-		$filename = $this->name . 'tpl.' . $partial . '.php';
+		$filename = $this->path . 'tpl.' . $partial . '.php';
 		include $filename;
 	}
 	
@@ -231,7 +230,7 @@ class GooTemplate extends Goo
 		{
 			// ****** Text
 			$out .= 'Template: ' . "\n";
-			$out .= 'template name: ' . $this->name . "\n";
+			$out .= 'template name: ' . $this->path . "\n";
 			$out .= 'template renders: ' . $this->count . "\n";
 		}
 		else
@@ -240,7 +239,7 @@ class GooTemplate extends Goo
 			$out .= '<ul>';
 			$out .= '<li><strong>Template</strong>';
 			$out .= '<ul>';
-			$out .= '<li>template name: ' . $this->name . '</li>';
+			$out .= '<li>template name: ' . $this->path . '</li>';
 			$out .= '<li>template renders: ' . $this->count . '</li>';
 			$out .= '</ul></li>';
 			$out .= '</ul>';

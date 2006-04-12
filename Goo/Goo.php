@@ -5,7 +5,7 @@
  * version 0.1
  * 
  * Copyright (C) 2006
- * by Davide S. Casali
+ * by Davide S. Casali, Alessandro Morandi
  * www.digitalhymn.com
  *
  * This is the core Goo component. This file contains the GooContext class,

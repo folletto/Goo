@@ -15,6 +15,10 @@ $g = new GooContext(array(
 
 $g->Template->render('header');
 
+// ****** Pager
+$g->Pager->makeHTAccess();
+$g->Pager->match();
+
 // ****** Database and Template Example
 {
 	$single = array('Title' => 'Vangelis Docet', 'Content' => 'This is some text.');
@@ -43,22 +47,6 @@ $g->Template->render('header');
 	$g->Template->render('items', $items);
 }
 
-// ****** Filters example
-{
-	function filter($text)
-	{
-		return '.: ' . $text . ' :.';
-	}
-
-	function refilter($text)
-	{
-		return '<h3> ' . $text . ' </h3>';
-	}
-
-	$g->setFilter('test', 'filter');
-	$g->setFilter('test', 'refilter');
-	echo $g->filter('test', 'oh long john');
-}
 
 // ****** Closing
 $g->_dbg($g->toString());

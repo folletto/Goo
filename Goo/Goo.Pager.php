@@ -43,7 +43,6 @@
 class GooPager extends Goo
 {
 	var $path = null;		// pages folder
-	var $isRunning = null;	// name of the page currently running
 	
 	/****************************************************************************************************
 	 * Constructor
@@ -172,6 +171,36 @@ class GooPager extends Goo
 			
 				@fclose($hfile);
 			}
+		}
+		
+		return $out;
+	}
+	
+	/****************************************************************************************************
+	 * To String method
+	 *
+	 * @param	optional: sets the output mode (def: 'html') [text, html]
+	 * @return	this object to string
+	 */
+	function toString($mode = '')
+	{
+		$out = '';
+		
+		if ($mode == 'text')
+		{
+			// ****** Text
+			$out .= 'Pager: ' . "\n";
+			$out .= 'pages path: ' . $this->path . "\n";
+		}
+		else
+		{
+			// ****** HTML
+			$out .= '<ul>';
+			$out .= '<li><strong>Pager</strong>';
+			$out .= '<ul>';
+			$out .= '<li>pages path: ' . $this->path . '</li>';
+			$out .= '</ul></li>';
+			$out .= '</ul>';
 		}
 		
 		return $out;

@@ -112,6 +112,9 @@ class GooPager extends Goo
 	 */
 	function page($handler)
 	{
+		// *** Preparing some variables in order to be usable easily in the page
+		$context = $this->context;
+		
 		if ($handler && file_exists($handler))
 		{
 			include $handler;

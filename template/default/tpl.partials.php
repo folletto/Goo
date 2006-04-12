@@ -11,5 +11,7 @@
 	</div>
 
 :items (the Partial mode supports short tags: <$Title> is converted to <?php echo $Title ?>)
-	<h2><$Title></h2>
-	<p><?php echo $Content; ?> <strong>One more kiss, dear. One more time.</strong> (<?php echo $HowMuch; ?>)</p>
+	<h3><$Title></h3>
+	<p><strong>One more kiss, dear. One more time.</strong><br />
+		<$HowMuch>: <$Content>
+		</p>

@@ -19,33 +19,7 @@ $g->Template->render('header');
 $g->Pager->makeHTAccess();
 $g->Pager->match();
 
-// ****** Database and Template Example
-{
-	$single = array('Title' => 'Vangelis Docet', 'Content' => 'This is some text.');
-	$double = array(
-		array('Title' => 'Porcois', 'Content' => 'Bunch of text'),
-		array('Title' => 'Porquette', 'Content' => 'Bleeding edge text')
-		);
 
-	$dbTest = $g->DB->table('goo_test');
-	//$dbTest->drop();
-	$dbTest->create(array(
-		'test3id'	=> 'key', 
-		'Title'		=> 'varchar(200)',
-		'Content'	=> 'text',
-		'HowMuch'	=> 'int'
-		));
-
-	if ($dbTest->count() < 2)
-	{
-		$dbTest->set(false, array('Title' => 'Vangelis Docet', 'Content' => 'Indeed he does.', 'HowMuch' => '10'));
-		$dbTest->set(false, array('Title' => 'Jarre Docet', 'Content' => 'He does too.', 'HowMuch' => '9'));
-	}
-
-	$items = $dbTest->get(true, 'HowMuch DESC');
-
-	$g->Template->render('items', $items);
-}
 
 
 // ****** Closing

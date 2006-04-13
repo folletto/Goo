@@ -113,14 +113,8 @@ class GooPager extends Goo
 			@list($path, $query) = explode('?', $relevant);	// split 'fake' part from query
 			$extra = explode('/', $path);
 		
-			$control = array_shift($extra);
-		
 			// ****** Prepare the array
-			$this->parsed = array(
-				'self'		=> $self,
-				'control'	=> $control,
-				'extra'		=> $extra,
-				);
+			$this->parsed = $extra;
 		}
 		
 		return $this->parsed;
@@ -135,23 +129,36 @@ class GooPager extends Goo
 	{
 		$purl = $this->parsed();
 		
+		// ****** Handling variables
+		$handler = array($this, 'page');
+		$params = $purl;
+		
 		// ****** Match
 		$file = '';
 		
-		if (is_array($purl) && isset($purl['control']) && $purl['control'] != '')
+		if (is_array($purl) && isset($purl[0]) && $purl[0] != '')
 		{
 			// *** Open a page
-			$file = $this->path . $purl['control'] . '.php';
+			for ($i = sizeof($purl); $i >= 0; $i--)
+			{
+				$name = join('.', array_slice($purl, 0, $i));
+				$path = $this->path . $name . '.php';
+				
+				if (file_exists($path))
+				{
+					$params = array($name);
+					$i = -1;
+				}
+			}
 		}
 		else
 		{
 			// *** Open the index
-			$file = $this->path . 'index.php';
+			$params = array('index');
 		}
 		
-		// ****** Include!
-		//$this->page($handler);
-		$this->handle(array($this, 'page'), $file);
+		// ****** Handle!
+		$this->handle($handler, $params);
 	}
 	
 	/****************************************************************************************************
@@ -177,8 +184,10 @@ class GooPager extends Goo
 	 * 
 	 * @param	page name
 	 */
-	function page($file)
+	function page($purl)
 	{
+		$file = $this->path . $purl[0] . '.php';
+		
 		// *** Preparing some variables in order to be usable easily in the page
 		$context = $this->context;
 		

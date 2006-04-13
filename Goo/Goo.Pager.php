@@ -43,6 +43,8 @@
 class GooPager extends Goo
 {
 	var $path = null;		// pages folder
+	var $parsed = null;		// parsed URI
+	var $binds = array();	// declared binds array
 	
 	/****************************************************************************************************
 	 * Constructor
@@ -58,14 +60,70 @@ class GooPager extends Goo
 	}
 	
 	/****************************************************************************************************
-	 * Bind an URI relative path to a specific handler
+	 * Bind an URI 'root' relative path to a specific handler
+	 * This in fact binds a function to a specific name 'directory' in the URI (mod_rewrite...)
 	 * 
-	 * @param	URI match string
+	 * @param	URI string, name to be matched
 	 * @param	handler
 	 */
-	function bind($uri, $handler)
+	function setBind($name, $handler)
 	{
+		if ($name && $handler)
+		{
+			$this->binds[$name] = $handler;
+		}
+	}
+	
+	/****************************************************************************************************
+	 * Returns the bind on an URI 'root' relative path to a specific handler
+	 * 
+	 * @param	URI string, name to be matched
+	 * @return	handler
+	 */
+	function getBind($name)
+	{
+		$out = false;
 		
+		if ($name && isset($this->binds[$name]))
+		{
+			$out = $name;
+		}
+		
+		return $out;
+	}
+	
+	/****************************************************************************************************
+	 * Parse the URI. Finds the real part of the path and splits the 'control' name from
+	 * the other parameters.
+	 * The query string is as always accessible via $_GET.
+	 * 
+	 * @return	parsed URI array
+	 */
+	function parsed()
+	{
+		if (!is_array($this->parsed))
+		{
+			// ****** Prepare the variables to be matched
+			$self = dirname($_SERVER['PHP_SELF']) . '/';	// relative self path
+			$uri = $_SERVER['REQUEST_URI'];					// user requested URI
+			//$pathinfo = $_SERVER['PATH_INFO'];			// WP uses PATH_INFO, unset to me...
+		
+			// *** Split path from query
+			$relevant = str_replace($self, '', $uri);		// get just the 'fake' part
+			@list($path, $query) = explode('?', $relevant);	// split 'fake' part from query
+			$extra = explode('/', $path);
+		
+			$control = array_shift($extra);
+		
+			// ****** Prepare the array
+			$this->parsed = array(
+				'self'		=> $self,
+				'control'	=> $control,
+				'extra'		=> $extra,
+				);
+		}
+		
+		return $this->parsed;
 	}
 	
 	/****************************************************************************************************
@@ -73,35 +131,45 @@ class GooPager extends Goo
 	 * and calls it.
 	 * 
 	 */
-	function match()
+	function exec()
 	{
-		// ****** Prepare the variables to be matched
-		$self = dirname($_SERVER['PHP_SELF']) . '/';	// relative self path
-		$uri = $_SERVER['REQUEST_URI'];					// user requested URI
-		//$pathinfo = $_SERVER['PATH_INFO'];			// WP uses PATH_INFO, unset to me...
-		
-		// *** Split path from query
-		$relevant = str_replace($self, '', $uri);		// get just the 'fake' part
-		@list($path, $query) = explode('?', $relevant);	// split 'fake' part from query
-		$chunks = explode('/', $path);
+		$purl = $this->parsed();
 		
 		// ****** Match
-		$handler = '';
+		$file = '';
 		
-		if (is_array($chunks) && isset($chunks[0]) && $chunks[0] != '')
+		if (is_array($purl) && isset($purl['control']) && $purl['control'] != '')
 		{
 			// *** Open a page
-			$handler = $this->path . $chunks[0] . '.php';
+			$file = $this->path . $purl['control'] . '.php';
 		}
 		else
 		{
 			// *** Open the index
-			$handler = $this->path . 'index.php';
-			
+			$file = $this->path . 'index.php';
 		}
 		
 		// ****** Include!
-		$this->page($handler);
+		//$this->page($handler);
+		$this->handle(array($this, 'page'), $file);
+	}
+	
+	/****************************************************************************************************
+	 * Handle the specified tag chunk.
+	 * 
+	 * @param	handler (function name string or object array($object, 'name'))
+	 * @param	chunks
+	 */
+	function handle($handler, $controller)
+	{
+		if (is_array($handler))
+		{
+			$handler[0]->{$handler[1]}($controller);
+		}
+		else
+		{
+			$handler($controller);
+		}
 	}
 	
 	/****************************************************************************************************
@@ -109,14 +177,14 @@ class GooPager extends Goo
 	 * 
 	 * @param	page name
 	 */
-	function page($handler)
+	function page($file)
 	{
 		// *** Preparing some variables in order to be usable easily in the page
 		$context = $this->context;
 		
-		if ($handler && file_exists($handler))
+		if ($file && file_exists($file))
 		{
-			include $handler;
+			include $file;
 		}
 		else
 		{
@@ -165,11 +233,17 @@ class GooPager extends Goo
 					// *** Write
 					if (@fwrite($hfile, $content) !== false)
 					{
+						// Rewrites written!
 						$out = true;
 					}
 				}
 			
 				@fclose($hfile);
+			}
+			else
+			{
+				// The Rewrites are already there!
+				$out = true;
 			}
 		}
 		

@@ -16,8 +16,8 @@ $g = new GooContext(array(
 $g->Template->render('header');
 
 // ****** Pager
-$g->Pager->makeHTAccess();
-$g->Pager->match();
+if (!$g->Pager->makeHTAccess()) $g->_dbg('Unable to create the .htaccess file. Check dir rights.');
+$g->Pager->exec();
 
 
 

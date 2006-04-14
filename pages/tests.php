@@ -10,11 +10,12 @@
  * 
  * Inside a page you can use:
  *  - $context, the GooContext object that is running the Pager goo.
- *  - $handler, the string containing the relative path to this file.
+ *  - $purl, the parsed url array
+ *  - $matchindex, how many items in the array have been matched to load this page
  *
  */
 
-
+echo '<p>There\'s also a <a href="tests/sub">subpage</a>.';
 
 // ****** Filters example
 {

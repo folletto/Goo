@@ -17,10 +17,17 @@ $g->Template->render('header');
 
 // ****** Pager
 if (!$g->Pager->makeHTAccess()) $g->_dbg('Unable to create the .htaccess file. Check dir rights.');
+
+function feed($purl, $matchindex)
+{
+	echo "<h3>don't feed the doc. use plutonium. back to the future.</h3>";
+	echo "<p>Parsed URL chunk 0: <strong>$purl[0]</strong>, Chunks matching: <strong>$matchindex</strong></p>";
+}
+$g->Pager->setBind('feed', 'feed');
+
 $g->Pager->exec();
 
-
-
+$g->_dbg($g->Pager->toString());
 
 // ****** Closing
 $g->_dbg($g->toString());

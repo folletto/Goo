@@ -131,51 +131,73 @@ class GooPager extends Goo
 		
 		// ****** Handling variables
 		$handler = array($this, 'page');
-		$params = $purl;
+		$matchindex = 0;
 		
 		// ****** Match
 		$file = '';
 		
 		if (is_array($purl) && isset($purl[0]) && $purl[0] != '')
 		{
-			// *** Open a page
-			for ($i = sizeof($purl); $i >= 0; $i--)
+			// *** Check for matches
+			for ($i = sizeof($purl); $i > 0; $i--)
 			{
 				$name = join('.', array_slice($purl, 0, $i));
 				$path = $this->path . $name . '.php';
 				
 				if (file_exists($path))
 				{
-					$params = array($name);
-					$i = -1;
+					// *** Use the file handler
+					$matchindex = $i;
+					$i = false;
 				}
+				else
+				{
+					// ****** Check for an entry in the bind array
+					$name = join('/', array_slice($purl, 0, $i));
+					if (isset($this->binds[$name]))
+					{
+						// *** Use the bound handler
+						$handler = $this->binds[$name];
+						$matchindex = $i;
+						$i = false;
+					}
+				}
+			}
+			
+			// *** No handler specified, at any level
+			if ($matchindex == 0)
+			{
+				$purl = array_merge(array('404'), $purl);
+				$matchindex = 1;
 			}
 		}
 		else
 		{
 			// *** Open the index
-			$params = array('index');
+			$purl = array('index');
+			$matchindex = 1;
 		}
 		
 		// ****** Handle!
-		$this->handle($handler, $params);
+		$this->handle($handler, $purl, $matchindex);
 	}
 	
 	/****************************************************************************************************
 	 * Handle the specified tag chunk.
 	 * 
 	 * @param	handler (function name string or object array($object, 'name'))
-	 * @param	chunks
+	 * @param	parsed url array
+	 * @param	matching parts of the array (0 = none)
 	 */
-	function handle($handler, $controller)
+	function handle($handler, $purl, $matchindex)
 	{
 		if (is_array($handler))
 		{
-			$handler[0]->{$handler[1]}($controller);
+			$handler[0]->{$handler[1]}($purl, $matchindex);
 		}
 		else
 		{
-			$handler($controller);
+			$handler($purl, $matchindex);
 		}
 	}
 	
@@ -183,24 +205,29 @@ class GooPager extends Goo
 	 * Load a specific page from the specified path.
 	 * 
 	 * @param	page name
+	 * @return	boolean, true on success
 	 */
-	function page($purl)
+	function page($purl, $matchindex)
 	{
-		$file = $this->path . $purl[0] . '.php';
+		$name = join('.', array_slice($purl, 0, $matchindex));
+		$path = $this->path . $name . '.php';
 		
 		// *** Preparing some variables in order to be usable easily in the page
 		$context = $this->context;
 		
-		if ($file && file_exists($file))
+		if ($path && file_exists($path))
 		{
-			include $file;
+			include $path;
+			
+			// *** File found and running
+			return true;
 		}
 		else
 		{
-			if (file_exists($this->path . '404.php'))
-			{
-				include $this->path . '404.php';
-			}
+			// *** File not found.
+			// Note: this function uses two exit points to avoid variables overwriting
+			//       from the included page.
+			return false;
 		}
 	}
 	
@@ -274,6 +301,7 @@ class GooPager extends Goo
 			// ****** Text
 			$out .= 'Pager: ' . "\n";
 			$out .= 'pages path: ' . $this->path . "\n";
+			$out .= 'parsed uri chunks: ' . join('/', $this->parsed()) . "\n";
 		}
 		else
 		{
@@ -282,6 +310,7 @@ class GooPager extends Goo
 			$out .= '<li><strong>Pager</strong>';
 			$out .= '<ul>';
 			$out .= '<li>pages path: ' . $this->path . '</li>';
+			$out .= '<li>parsed uri chunks: ' . join('/', $this->parsed()) . '</li>';
 			$out .= '</ul></li>';
 			$out .= '</ul>';
 		}

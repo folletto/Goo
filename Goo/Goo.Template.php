@@ -48,6 +48,9 @@ class GooTemplate extends Goo
 		$this->path = $path;
 		$this->partials = $this->read($path);
 		
+		// ****** Filters
+		$this->context->setFilter('template', array($this, 'filterTemplate'));
+		
 		// ****** Buffering
 		ob_start();
 	}
@@ -192,8 +195,9 @@ class GooTemplate extends Goo
 		extract($item);
 		
 		// *** Evaluates the string
-		// adding a intermediate 'smart variables' parser
-		$code = preg_replace('/\<\$(\w+)\>/', '<?php echo \$$1; ?>', $this->partials[$partial]);
+		$code = $this->partials[$partial];
+		/*$code = preg_replace('/\<\$(\w+)\>/', '<?php echo \$$1; ?>', $code);*/
+		$code = $this->context->filter('template', $code);
 		
 		// partials are HTML mainly, so we close the php tags before evaluating.
 		eval(' ?' . '>' . $code . '<' . '?php ');
@@ -213,6 +217,28 @@ class GooTemplate extends Goo
 		// *** Include a file
 		$filename = $this->path . 'tpl.' . $partial . '.php';
 		include $filename;
+	}
+	
+	/****************************************************************************************************
+	 * Template filter for partials renderer.
+	 * This function implements the smart variables parsing (<$Name>) in the partial and
+	 * path relativization for some (X)HTML tags.
+	 * 
+	 * @param	input text
+	 * @return	output relativized text
+	 */
+	function filterTemplate($text)
+	{
+		$out = $text;
+		
+		// ****** Smart variables parsing
+		$out = preg_replace('/\<\$(\w+)\>/', '<?php echo \$$1; ?>', $out);
+		
+		// ****** Relativize
+		$out = preg_replace('/<link(.*)href="(.*)"/i', '<link$1href="' . $this->path . '$2"', $out);
+		$out = preg_replace('/<img(.*)src="(.*)"/i', '<img$1src="' . $this->path . '$2"', $out);
+		
+		return $out;
 	}
 	
 	/****************************************************************************************************

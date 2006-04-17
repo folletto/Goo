@@ -1,7 +1,7 @@
 <?php
 /*
  * Goo Template
- * version 0.2
+ * version 0.3
  * 
  * Copyright (C) 2006
  * by Davide S. Casali, Alessandro Morandi
@@ -30,8 +30,9 @@
 
 class GooTemplate extends Goo
 {
-	var $path	= '';			// template name (path)
-	var $count	= 0;			// count template renders
+	var $path		= '';		// template name (path)
+	var $selfpath	= '';		// template path, relative to site root
+	var $count		= 0;		// count template renders
 	
 	var $partials = array();	// partials array
 	
@@ -43,10 +44,9 @@ class GooTemplate extends Goo
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
-		$path = trim($path, '/') . '/';
-		
-		$this->path = $path;
-		$this->partials = $this->read($path);
+		$this->path = trim($path, '/') . '/';
+		$this->selfpath = dirname($_SERVER['PHP_SELF']) . '/' . $this->path;
+		$this->partials = $this->read($this->path);
 		
 		// ****** Filters
 		$this->context->setFilter('template', array($this, 'filterTemplate'));
@@ -231,12 +231,15 @@ class GooTemplate extends Goo
 	{
 		$out = $text;
 		
+		// ****** Prepare
+		$path = $this->selfpath;
+		
 		// ****** Smart variables parsing
 		$out = preg_replace('/\<\$(\w+)\>/', '<?php echo \$$1; ?>', $out);
 		
 		// ****** Relativize
-		$out = preg_replace('/<link(.*)href="(.*)"/i', '<link$1href="' . $this->path . '$2"', $out);
-		$out = preg_replace('/<img(.*)src="(.*)"/i', '<img$1src="' . $this->path . '$2"', $out);
+		$out = preg_replace('/<link(.*)href="(.*)"/i', '<link$1href="' . $path . '$2"', $out);
+		$out = preg_replace('/<img(.*)src="(.*)"/i', '<img$1src="' . $path . '$2"', $out);
 		
 		return $out;
 	}

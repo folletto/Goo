@@ -166,7 +166,7 @@ class GooTemplate extends Goo
 				foreach ($array as $item)
 				{
 					$renderer[0]->{$renderer[1]}($partial, $item);
-				}
+				}
 			}
 			else
 			{

@@ -145,11 +145,19 @@ class GooTemplate extends Goo
 	 * @param	optional array to be inserted (uni/bi-dimensional)
 	 * @param	optional render function name callback (def: Partial) [Partial, File]
 	 */
-	function render($partial, $array = null, $fx = 'Partial')
+	function render($partial, $array = null, $fx = null)
 	{
 		$this->count++;
-		$renderer = 'renderHelper' . $fx . '';
 		
+		// ****** Select renderer
+		if ($fx)
+			$renderer = array($this, 'renderHelper' . $fx . '');
+		else if (is_array($fx))
+			$renderer = $fx;
+		else
+			$renderer = array($this, 'renderHelperPartial');
+		
+		// ****** Render loops
 		if (is_array($array))
 		{
 			if (isset($array[0]) && is_array($array[0]))
@@ -157,18 +165,18 @@ class GooTemplate extends Goo
 				// ****** Bidimensional
 				foreach ($array as $item)
 				{
-					$this->{$renderer}($partial, $item);
-				}
+					$renderer[0]->{$renderer[1]}($partial, $item);
+				}
 			}
 			else
 			{
 				// ****** Monodimensional
-				$this->{$renderer}($partial, $array);
+				$renderer[0]->{$renderer[1]}($partial, $array);
 			}
 		}
 		else if ($array == null)
 		{
-			$this->{$renderer}($partial, array());
+			$renderer[0]->{$renderer[1]}($partial, array());
 		}
 	}
 	

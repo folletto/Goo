@@ -212,7 +212,10 @@ class GooContext
 		{
 			foreach ($this->filters[$filter] as $fx)
 			{
-				$out = $fx($out);
+				if (is_array($fx))
+					$out = $fx[0]->{$fx[1]}($out);
+				else
+					$out = $fx($out);
 			}
 		}
 		

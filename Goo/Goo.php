@@ -331,7 +331,7 @@ class Goo
 	function Goo(&$context)
 	{
 		// ****** Init Context
-		$this->context = $context;
+		$this->context = &$context;
 		
 		// ****** Init Language
 		if ($context->getEnv('lang'))

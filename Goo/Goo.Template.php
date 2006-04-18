@@ -39,9 +39,9 @@ class GooTemplate extends Goo
 	/****************************************************************************************************
 	 * Constructor
 	 */
-	function GooTemplate($context, $path)
+	function GooTemplate(&$context, $path)
 	{
-		$this->Goo($context); // Super Constructor
+		$this->Goo(&$context); // Super Constructor
 		
 		// ****** Init
 		$this->path = trim($path, '/') . '/';

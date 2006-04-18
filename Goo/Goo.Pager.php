@@ -49,14 +49,15 @@ class GooPager extends Goo
 	/****************************************************************************************************
 	 * Constructor
 	 */
-	function GooPager($context, $path)
+	function GooPager(&$context, $path)
 	{
-		$this->Goo($context); // Super Constructor
+		$this->Goo(&$context); // Super Constructor
 		
 		// ****** Init
-		$path = trim($path, '/') . '/';
+		$this->path = trim($path, '/') . '/';
 		
-		$this->path = $path;
+		// ****** Filters
+		$this->context->setFilter('template', array($this, 'filterTemplate'));
 	}
 	
 	/****************************************************************************************************
@@ -107,7 +108,7 @@ class GooPager extends Goo
 			$self = dirname($_SERVER['PHP_SELF']) . '/';	// relative self path
 			$uri = $_SERVER['REQUEST_URI'];					// user requested URI
 			//$pathinfo = $_SERVER['PATH_INFO'];			// WP uses PATH_INFO, unset to me...
-		
+			
 			// *** Split path from query
 			$relevant = str_replace($self, '', $uri);		// get just the 'fake' part
 			@list($path, $query) = explode('?', $relevant);	// split 'fake' part from query
@@ -282,6 +283,26 @@ class GooPager extends Goo
 				$out = true;
 			}
 		}
+		
+		return $out;
+	}
+	
+	/****************************************************************************************************
+	 * Template filter to allow path addressing working
+	 * This function converts 
+	 * 
+	 * @param	input text
+	 * @return	output relativized text
+	 */
+	function filterTemplate($text)
+	{
+		$out = $text;
+		
+		// ****** Prepare
+		$path = dirname($_SERVER['PHP_SELF']) . '/';
+		
+		// ****** Relativize
+		$out = preg_replace('/<a(.*)href="(.*)"/i', '<a$1href="' . $path . '$2"', $out);
 		
 		return $out;
 	}

@@ -35,9 +35,9 @@ class GooUsers extends Goo
 	/****************************************************************************************************
 	 * Constructor
 	 */
-	function GooUsers($context, $table)
+	function GooUsers(&$context, $table)
 	{
-		$this->Goo($context); // Super Constructor
+		$this->Goo(&$context); // Super Constructor
 		
 		// ****** Init
 		$this->dbUsers = $context->DB->table($table);

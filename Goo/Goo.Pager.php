@@ -51,7 +51,7 @@ class GooPager extends Goo
 	 */
 	function GooPager(&$context, $path)
 	{
-		$this->Goo(&$context); // Super Constructor
+		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
 		$this->path = trim($path, '/') . '/';

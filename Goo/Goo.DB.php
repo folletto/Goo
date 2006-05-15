@@ -51,7 +51,7 @@ class GooDB extends Goo
 	 */
 	function GooDB(&$context, $uri)
 	{
-		$this->Goo(&$context); // Super Constructor
+		$this->Goo($context); // Super Constructor
 		
 		// ****** Connect
 		$this->setConnection($uri);

@@ -432,8 +432,8 @@ class GooDBTable
 	 * Count the number of rows matching the where condition. If no where condition is specified,
 	 * it returns the table length.
 	 *
-	 * @param	optional where condition (false means INSERT)
-	 * @return	boolean true on success
+	 * @param	optional where condition
+	 * @return	count index
 	 */
 	function count($where = true)
 	{

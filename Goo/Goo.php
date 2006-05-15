@@ -1,6 +1,6 @@
 <?php
 /*
- * GoO
+ * Goo
  * Golem Objects
  * version 0.1
  * 
@@ -170,7 +170,10 @@ class GooContext
 	 */
 	function getEnv($name)
 	{
-		return $this->env[$name];
+		if (isset($this->env[$name]))
+			return $this->env[$name];
+		else
+			return null;
 	}
 	
 	/****************************************************************************************************

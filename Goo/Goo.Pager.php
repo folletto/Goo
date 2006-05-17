@@ -211,6 +211,7 @@ class GooPager extends Goo
 	function page($purl, $matchindex)
 	{
 		$name = join('.', array_slice($purl, 0, $matchindex));
+		$root = dirname($_SERVER['PHP_SELF']) . '/';
 		$path = $this->path . $name . '.php';
 		
 		// *** Preparing some variables in order to be usable easily in the page

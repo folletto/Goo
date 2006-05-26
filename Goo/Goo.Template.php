@@ -196,6 +196,28 @@ class GooTemplate extends Goo {
 	}
 	
 	/****************************************************************************************************
+	 * Returns any output from the called function.
+	 * 
+	 * @param		function to have the output redirected to a file
+	 * @return	output of the function
+	 */
+	function getOutputOf($fx) {
+		$out = '';
+		
+		ob_flush();
+		
+		$args = func_get_args();
+		array_shift($args);
+		
+		call_user_func_array($fx, $args);
+		
+		$out = ob_get_contents();
+		ob_clean();
+		
+		return $out;
+	}
+	
+	/****************************************************************************************************
 	 * Template filter for partials renderer.
 	 * This function implements the smart variables parsing (<$Name>) in the partial and
 	 * path relativization for some (X)HTML tags.

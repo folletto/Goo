@@ -40,8 +40,7 @@
  ****************************************************************************************************
  */
 
-class GooPager extends Goo
-{
+class GooPager extends Goo {
 	var $path = null;		// pages folder
 	var $parsed = null;		// parsed URI
 	var $binds = array();	// declared binds array
@@ -49,8 +48,7 @@ class GooPager extends Goo
 	/****************************************************************************************************
 	 * Constructor
 	 */
-	function GooPager(&$context, $path)
-	{
+	function GooPager(&$context, $path) {
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
@@ -67,10 +65,8 @@ class GooPager extends Goo
 	 * @param	URI string, name to be matched
 	 * @param	handler
 	 */
-	function setBind($name, $handler)
-	{
-		if ($name && $handler)
-		{
+	function setBind($name, $handler) {
+		if ($name && $handler) {
 			$this->binds[$name] = $handler;
 		}
 	}
@@ -81,12 +77,10 @@ class GooPager extends Goo
 	 * @param	URI string, name to be matched
 	 * @return	handler
 	 */
-	function getBind($name)
-	{
+	function getBind($name) {
 		$out = false;
 		
-		if ($name && isset($this->binds[$name]))
-		{
+		if ($name && isset($this->binds[$name])) {
 			$out = $name;
 		}
 		
@@ -100,10 +94,8 @@ class GooPager extends Goo
 	 * 
 	 * @return	parsed URI array
 	 */
-	function parsed()
-	{
-		if (!is_array($this->parsed))
-		{
+	function parsed() {
+		if (!is_array($this->parsed)) {
 			// ****** Prepare the variables to be matched
 			$self = dirname($_SERVER['PHP_SELF']) . '/';	// relative self path
 			$uri = $_SERVER['REQUEST_URI'];					// user requested URI
@@ -126,8 +118,7 @@ class GooPager extends Goo
 	 * and calls it.
 	 * 
 	 */
-	function exec()
-	{
+	function exec() {
 		$purl = $this->parsed();
 		
 		// ****** Handling variables
@@ -137,26 +128,20 @@ class GooPager extends Goo
 		// ****** Match
 		$file = '';
 		
-		if (is_array($purl) && isset($purl[0]) && $purl[0] != '')
-		{
+		if (is_array($purl) && isset($purl[0]) && $purl[0] != '') {
 			// *** Check for matches
-			for ($i = sizeof($purl); $i > 0; $i--)
-			{
+			for ($i = sizeof($purl); $i > 0; $i--) {
 				$name = join('.', array_slice($purl, 0, $i));
 				$path = $this->path . $name . '.php';
 				
-				if (file_exists($path))
-				{
+				if (file_exists($path)) {
 					// *** Use the file handler
 					$matchindex = $i;
 					$i = false;
-				}
-				else
-				{
+				} else {
 					// ****** Check for an entry in the bind array
 					$name = join('/', array_slice($purl, 0, $i));
-					if (isset($this->binds[$name]))
-					{
+					if (isset($this->binds[$name])) {
 						// *** Use the bound handler
 						$handler = $this->binds[$name];
 						$matchindex = $i;
@@ -166,14 +151,11 @@ class GooPager extends Goo
 			}
 			
 			// *** No handler specified, at any level
-			if ($matchindex == 0)
-			{
+			if ($matchindex == 0) {
 				$purl = array_merge(array('404'), $purl);
 				$matchindex = 1;
 			}
-		}
-		else
-		{
+		} else {
 			// *** Open the index
 			$purl = array('index');
 			$matchindex = 1;
@@ -190,14 +172,10 @@ class GooPager extends Goo
 	 * @param	parsed url array
 	 * @param	matching parts of the array (0 = none)
 	 */
-	function handle($handler, $purl, $matchindex)
-	{
-		if (is_array($handler))
-		{
+	function handle($handler, $purl, $matchindex) {
+		if (is_array($handler)) {
 			$handler[0]->{$handler[1]}($purl, $matchindex);
-		}
-		else
-		{
+		} else {
 			$handler($purl, $matchindex);
 		}
 	}
@@ -208,8 +186,7 @@ class GooPager extends Goo
 	 * @param	page name
 	 * @return	boolean, true on success
 	 */
-	function page($purl, $matchindex)
-	{
+	function page($purl, $matchindex) {
 		$name = join('.', array_slice($purl, 0, $matchindex));
 		$root = dirname($_SERVER['PHP_SELF']) . '/';
 		$path = $this->path . $name . '.php';
@@ -217,15 +194,12 @@ class GooPager extends Goo
 		// *** Preparing some variables in order to be usable easily in the page
 		$context = $this->context;
 		
-		if ($path && file_exists($path))
-		{
+		if ($path && file_exists($path)) {
 			include $path;
 			
 			// *** File found and running
 			return true;
-		}
-		else
-		{
+		} else {
 			// *** File not found.
 			// Note: this function uses two exit points to avoid variables overwriting
 			//       from the included page.
@@ -238,16 +212,14 @@ class GooPager extends Goo
 	 * 
 	 * @return	boolean true on success
 	 */
-	function makeHTAccess()
-	{
+	function makeHTAccess() {
 		$out = false;
 		$self = dirname($_SERVER['PHP_SELF']) . '/';	// relative self path
 		$path = dirname($_SERVER['SCRIPT_FILENAME']) . '/'; // also PATH_TRANSLATED?
 		$htaccess = $path . '.htaccess';
 		
 		if (file_exists($htaccess) && is_writable($htaccess)
-			|| is_writable($path))
-		{
+			|| is_writable($path)) {
 			// ****** Prepare text
 			$content = '';
 			$content .= "\n\n";
@@ -263,20 +235,19 @@ class GooPager extends Goo
 			// ****** Existence check
 			$old = file_get_contents($htaccess);
 			
-			if (substr($old, $content) === false)
-			{
+			if (substr($old, $content) === false) {
 				// ****** Write the mod_rewrite rules
 				$hfile = @fopen($htaccess, 'a');
-				{	
+				if ($hfile) {
 					// *** Write
 					if (@fwrite($hfile, $content) !== false)
 					{
 						// Rewrites written!
 						$out = true;
 					}
+					
+					@fclose($hfile);
 				}
-			
-				@fclose($hfile);
 			}
 			else
 			{
@@ -295,8 +266,7 @@ class GooPager extends Goo
 	 * @param	input text
 	 * @return	output relativized text
 	 */
-	function filterTemplate($text)
-	{
+	function filterTemplate($text) {
 		$out = $text;
 		
 		// ****** Prepare
@@ -314,19 +284,15 @@ class GooPager extends Goo
 	 * @param	optional: sets the output mode (def: 'html') [text, html]
 	 * @return	this object to string
 	 */
-	function toString($mode = '')
-	{
+	function toString($mode = '') {
 		$out = '';
 		
-		if ($mode == 'text')
-		{
+		if ($mode == 'text') {
 			// ****** Text
 			$out .= 'Pager: ' . "\n";
 			$out .= 'pages path: ' . $this->path . "\n";
 			$out .= 'parsed uri chunks: ' . join('/', $this->parsed()) . "\n";
-		}
-		else
-		{
+		} else {
 			// ****** HTML
 			$out .= '<ul>';
 			$out .= '<li><strong>Pager</strong>';

@@ -28,8 +28,7 @@
  ****************************************************************************************************
  */
 
-class GooTemplate extends Goo
-{
+class GooTemplate extends Goo {
 	var $path		= '';		// template name (path)
 	var $selfpath	= '';		// template path, relative to site root
 	var $count		= 0;		// count template renders
@@ -39,8 +38,7 @@ class GooTemplate extends Goo
 	/****************************************************************************************************
 	 * Constructor
 	 */
-	function GooTemplate(&$context, $path)
-	{
+	function GooTemplate(&$context, $path) {
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
@@ -63,19 +61,14 @@ class GooTemplate extends Goo
 	 * @param	template folder
 	 * @return	array-ized partials ('partial' => 'template block')
 	 */
-	function read($template)
-	{
+	function read($template) {
 		$out = array();
 		
-		if (is_dir($template))
-		{
+		if (is_dir($template)) {
 			// ****** Read template directory
-			if ($hdir = @opendir($template))
-			{
-				while (($file = readdir($hdir)) !== false)
-				{
-					if (strpos($file, 'tpl.') === 0)
-					{
+			if ($hdir = @opendir($template)) {
+				while (($file = readdir($hdir)) !== false) {
+					if (strpos($file, 'tpl.') === 0) {
 						$content = file_get_contents($template . $file); // PHP4.3+
 						
 						//preg_match_all('/:(\w+).*\n+(.|\n)*\n:end\n/i', $content, $matches, PREG_SET_ORDER);
@@ -97,8 +90,7 @@ class GooTemplate extends Goo
 	 * @param	text string
 	 * @return	array-ized partials ('partial' => 'template block')
 	 */
-	function readPartials($string)
-	{
+	function readPartials($string) {
 		$out = array();
 		
 		$partial_name = null;
@@ -106,23 +98,18 @@ class GooTemplate extends Goo
 		
 		$lines = preg_split('/\n/', $string);
 		
-		foreach ($lines as $line)
-		{
-			if (preg_match('/^:(\w+)\s*.*$/i', $line, $matches) > 0)
-			{
+		foreach ($lines as $line) {
+			if (preg_match('/^:(\w+)\s*.*$/i', $line, $matches) > 0) {
 				// ****** Partial
 				// *** Close old partial
-				if ($partial_name !== null)
-				{
+				if ($partial_name !== null) {
 					$out[$partial_name] = $partial_content;
 					$partial_content = "";
 				}
 				
 				// *** Start new partial
 				$partial_name = $matches[1];
-			}
-			else
-			{
+			} else {
 				// ****** Fill content
 				if ($partial_name !== null && $line !== '')
 					$partial_content .= $line . "\n";
@@ -130,8 +117,7 @@ class GooTemplate extends Goo
 		}
 		
 		// *** Close last partial
-		if ($partial_name !== null)
-		{
+		if ($partial_name !== null) {
 			$out[$partial_name] = $partial_content;
 		}
 		
@@ -148,8 +134,7 @@ class GooTemplate extends Goo
 	 * @param	optional array to be inserted (uni/bi-dimensional)
 	 * @param	optional render function name callback (def: Partial) [Partial, File]
 	 */
-	function render($partial, $array = null, $fx = null)
-	{
+	function render($partial, $array = null, $fx = null) {
 		$this->count++;
 		
 		// ****** Select renderer
@@ -161,24 +146,17 @@ class GooTemplate extends Goo
 			$renderer = array($this, 'renderHelperPartial');
 		
 		// ****** Render loops
-		if (is_array($array))
-		{
-			if (isset($array[0]) && is_array($array[0]))
-			{
+		if (is_array($array)) {
+			if (isset($array[0]) && is_array($array[0])) {
 				// ****** Bidimensional
-				foreach ($array as $item)
-				{
+				foreach ($array as $item) {
 					$renderer[0]->{$renderer[1]}($partial, $item);
 				}
-			}
-			else
-			{
+			} else {
 				// ****** Monodimensional
 				$renderer[0]->{$renderer[1]}($partial, $array);
 			}
-		}
-		else if ($array == null)
-		{
+		} else if ($array == null) {
 			$renderer[0]->{$renderer[1]}($partial, array());
 		}
 	}
@@ -190,8 +168,7 @@ class GooTemplate extends Goo
 	 * @param	partial name
 	 * @param	item array
 	 */
-	function renderHelperPartial($partial, $item)
-	{
+	function renderHelperPartial($partial, $item) {
 		extract($item);
 		
 		// *** Evaluates the string
@@ -210,8 +187,7 @@ class GooTemplate extends Goo
 	 * @param	partial name
 	 * @param	item array
 	 */
-	function renderHelperFile($partial, $item)
-	{
+	function renderHelperFile($partial, $item) {
 		extract($item);
 		
 		// *** Include a file
@@ -227,8 +203,7 @@ class GooTemplate extends Goo
 	 * @param	input text
 	 * @return	output relativized text
 	 */
-	function filterTemplate($text)
-	{
+	function filterTemplate($text) {
 		$out = $text;
 		
 		// ****** Prepare
@@ -248,8 +223,7 @@ class GooTemplate extends Goo
 	 * Check for cache file existence and in case use it.
 	 * 
 	 */
-	function cache()
-	{
+	function cache() {
 		/// TODO
 	}
 	
@@ -259,19 +233,15 @@ class GooTemplate extends Goo
 	 * @param	optional: sets the output mode (def: 'html') [text, html]
 	 * @return	this object to string
 	 */
-	function toString($mode = '')
-	{
+	function toString($mode = '') {
 		$out = '';
 		
-		if ($mode == 'text')
-		{
+		if ($mode == 'text') {
 			// ****** Text
 			$out .= 'Template: ' . "\n";
 			$out .= 'template name: ' . $this->path . "\n";
 			$out .= 'template renders: ' . $this->count . "\n";
-		}
-		else
-		{
+		} else {
 			// ****** HTML
 			$out .= '<ul>';
 			$out .= '<li><strong>Template</strong>';

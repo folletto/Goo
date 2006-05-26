@@ -38,8 +38,7 @@
  * Defines the execution environment for GoO
  *
  */
-class GooContext
-{
+class GooContext {
 	var $version = 0001;	// incremental version id (for compatibility checks) [syntax: Mmmm]
 	
 	var $env = array();		// environment variables array
@@ -53,8 +52,7 @@ class GooContext
 	 *
 	 * @param	environment array
 	 */
-	function GooContext($env = null)
-	{
+	function GooContext($env = null) {
 		// ****** Timer
 		$mtime = explode(' ', microtime());
 		$this->instanceBornAt = $mtime[1] + $mtime[0];
@@ -70,11 +68,9 @@ class GooContext
 	 *
 	 * @param	environment array
 	 */
-	function init($env = null)
-	{
+	function init($env = null) {
 		// ****** Prepare
-		if (!is_array($env))
-		{
+		if (!is_array($env)) {
 			$env = array(
 				);
 		}
@@ -82,10 +78,8 @@ class GooContext
 		$this->env = $env;
 		
 		// ****** Loop through
-		foreach ($env as $name => $params)
-		{
-			if ($this->setGoo($name, $params))
-			{
+		foreach ($env as $name => $params) {
+			if ($this->setGoo($name, $params)) {
 				// *** Remove the goo name from the environment
 				unset($this->env[$name]);
 			}
@@ -98,25 +92,21 @@ class GooContext
 	 *
 	 * @param	goo file name (adds file: goo.name.php)
 	 */
-	function setGoo($name, $params = '')
-	{
+	function setGoo($name, $params = '') {
 		$out = false;
 		
 		// Checks if the first letter is not a lowercase letter
-		if (!preg_match('/^[a-z]/', $name))
-		{
+		if (!preg_match('/^[a-z]/', $name)) {
 			$filename = dirname(__FILE__) . '/Goo.' . $name . '.php';
 			$classname = 'Goo' . $name;
 		
 			// ****** Creation
-			if ($name && file_exists($filename))
-			{
+			if ($name && file_exists($filename)) {
 				include_once $filename;
 			
 				// ****** Bind
 				$goo = new $classname($this, $params);
-				if (is_subclass_of($goo, 'Goo'))
-				{
+				if (is_subclass_of($goo, 'Goo')) {
 					// ...to Array
 					$this->goos[$name] = &$goo;
 					// ...to gooObj
@@ -135,8 +125,7 @@ class GooContext
 	 *
 	 * @return	array containing all the enabled goos
 	 */
-	function getGoos()
-	{
+	function getGoos() {
 		return $this->goos;
 	}
 	
@@ -146,8 +135,7 @@ class GooContext
 	 * @param	goo name
 	 * @return	goo
 	 */
-	function getGoo($name)
-	{
+	function getGoo($name) {
 		return $this->goos[$name];
 	}
 	
@@ -157,8 +145,7 @@ class GooContext
 	 * @param	goo name
 	 * @return	boolean true if name is a loaded goo name
 	 */
-	function isGoo($name)
-	{
+	function isGoo($name) {
 		return array_key_exists($name, $this->goos);
 	}
 	
@@ -168,8 +155,7 @@ class GooContext
 	 * @param	environment variable
 	 * @return	variable value
 	 */
-	function getEnv($name)
-	{
+	function getEnv($name) {
 		if (isset($this->env[$name]))
 			return $this->env[$name];
 		else
@@ -184,8 +170,7 @@ class GooContext
 	 * @param	optional position, must be int
 	 * @return	variable value
 	 */
-	function setFilter($filter, $fx, $position = false)
-	{
+	function setFilter($filter, $fx, $position = false) {
 		// ****** Prepare
 		if (!isset($this->filters[$filter]))
 			$this->filters[$filter] = array();
@@ -207,14 +192,11 @@ class GooContext
 	 * @param	data stream
 	 * @return	variable value
 	 */
-	function filter($filter, $stream)
-	{
+	function filter($filter, $stream) {
 		$out = $stream;
 		
-		if (isset($this->filters[$filter]) && is_array($this->filters[$filter]))
-		{
-			foreach ($this->filters[$filter] as $fx)
-			{
+		if (isset($this->filters[$filter]) && is_array($this->filters[$filter])) {
+			foreach ($this->filters[$filter] as $fx) {
 				if (is_array($fx))
 					$out = $fx[0]->{$fx[1]}($out);
 				else
@@ -231,8 +213,7 @@ class GooContext
 	 * @param	optional: sets the decimal places to be returned (default: all)
 	 * @return	this object to string
 	 */
-	function lifeTime($limit = false)
-	{
+	function lifeTime($limit = false) {
 		$mtime = explode(' ', microtime());
 		$out = ($mtime[1] + $mtime[0]) - $this->instanceBornAt;
 		
@@ -248,38 +229,30 @@ class GooContext
 	 * @param	optional: sets the output mode (def: 'html') [text, html]
 	 * @return	this object to string
 	 */
-	function toString($mode = '')
-	{
+	function toString($mode = '') {
 		$out = '';
 		
-		if ($mode == 'text')
-		{
+		if ($mode == 'text') {
 			// ****** Text
 			$out .= 'Env: ' . "\n";
-			foreach ($this->env as $name => $value)
-			{
+			foreach ($this->env as $name => $value) {
 				$out .= ' * ' . $name . ' = ' . $value . '' . "\n";
 			}
 			$out .= 'Goos: ';
-			foreach ($this->goos as $name => $obj)
-			{
+			foreach ($this->goos as $name => $obj) {
 				$out .= ' * ' . $name . "\n";
 			}
 			$out .= "\n";
-		}
-		else
-		{
+		} else {
 			// ****** HTML
 			$out .= '<ul>';
 			$out .= '<li>Env<ul>';
-			foreach ($this->env as $name => $value)
-			{
+			foreach ($this->env as $name => $value) {
 				$out .= '<li><strong>' . $name . '</strong> = ' . $value . '</li>';
 			}
 			$out .= '</ul></li>';
 			$out .= '<li>Goos<ul>';
-			foreach ($this->goos as $name => $obj)
-			{
+			foreach ($this->goos as $name => $obj) {
 				$out .= '<li><strong>' . $name . '</strong></li>';
 			}
 			$out .= '</ul></li>';
@@ -294,8 +267,7 @@ class GooContext
 	 *
 	 * @param	text to be displayed
 	 */
-	function _dbg($text, $return = false)
-	{
+	function _dbg($text, $return = false) {
 		$out = print_r($text, true);
 		
 		$out = str_replace("\n", '<br/>', $out);
@@ -331,14 +303,12 @@ class Goo
 	 * Golem Objects Constructor Method
 	 * 
 	 */
-	function Goo(&$context)
-	{
+	function Goo(&$context) {
 		// ****** Init Context
 		$this->context = &$context;
 		
 		// ****** Init Language
-		if ($context->getEnv('lang'))
-		{
+		if ($context->getEnv('lang')) {
 			$this->lang = $context->getEnv('lang');
 		}
 	}

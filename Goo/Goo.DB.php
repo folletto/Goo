@@ -30,8 +30,7 @@
  ****************************************************************************************************
  */
 
-class GooDB extends Goo
-{
+class GooDB extends Goo {
 	var $connection = null;
 	var $uri = '';
 	var $scheme = '';
@@ -49,8 +48,7 @@ class GooDB extends Goo
 	/****************************************************************************************************
 	 * Constructor
 	 */
-	function GooDB(&$context, $uri)
-	{
+	function GooDB(&$context, $uri) {
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Connect
@@ -63,8 +61,7 @@ class GooDB extends Goo
 	 * @param	uri of the database (mysql://user:pass@host/database)
 	 * @param	new link (default true)
 	 */
-	function setConnection($uri, $new_link = true)
-	{
+	function setConnection($uri, $new_link = true) {
 		$err = '';
 		
 		// ****** Prepare
@@ -82,17 +79,13 @@ class GooDB extends Goo
 		if (trim($this->host) == "") $err .= 'Missing hostname. ';
 		
 		// ****** Err
-		if ($err)
-		{
+		if ($err) {
 			$this->_log($err);
-		}
-		else
-		{
+		} else {
 			// ****** Connect
 			$this->connection = mysql_connect($this->host, $this->user, $this->pass, $new_link);
 			
-			if ($this->connection)
-			{
+			if ($this->connection) {
 				mysql_select_db($this->name) OR $this->_log('Maybe the database "' . $this->name . '@' . $this->host . '" is missing or misspelled.'); 
 			}
 		}
@@ -103,8 +96,7 @@ class GooDB extends Goo
 	 *
 	 * @return	connection id
 	 */
-	function getConnection()
-	{
+	function getConnection() {
 		return $this->connection;
 	}
 	
@@ -115,12 +107,10 @@ class GooDB extends Goo
 	 * @param	sql query string
 	 * @return	on success the fields array OR the query id. On failure boolean false.
 	 */
-	function query($query)
-	{
+	function query($query) {
 		$out = false;
 		
-		if ($this->connection)
-		{
+		if ($this->connection) {
 			// ****** Various
 			$this->count++;
 			$this->lastQuery = $query;
@@ -129,21 +119,16 @@ class GooDB extends Goo
 			if ($this->verbose) echo '<div style="font-family: Courier New, serif; font-size: 12px; color: #ffffff; background: #aa0000" size="-1"><strong>@</strong> ' . $query . '</div>';
 		
 			// ****** Query
-			if ($result = mysql_query($query, $this->connection))
-			{
-				if (gettype($result) == 'resource')
-				{
+			if ($result = mysql_query($query, $this->connection)) {
+				if (gettype($result) == 'resource') {
 					// *** SELECT/SHOW/DESCRIBE/EXPLAIN
 					$this->lastRows = @mysql_num_rows($result);
 					
 					$out = array();
-					while ($row = mysql_fetch_array($result))
-					{
+					while ($row = mysql_fetch_array($result)) {
 						$out[] = $row;
 					}
-				}
-				else
-				{
+				} else {
 					// *** INSERT/UPDATE/DELETE/REPLACE
 					$this->lastRows = @mysql_affected_rows($this->connection);
 					if ($result === true)
@@ -165,8 +150,7 @@ class GooDB extends Goo
 	 * @param	optional where condition string
 	 * @return	number of rows matching
 	 */
-	function count($table, $where = true)
-	{
+	function count($table, $where = true) {
 		$out = false;
 		
 		$query = '
@@ -189,16 +173,13 @@ class GooDB extends Goo
 	 *
 	 * @return	database tables array
 	 */
-	function getTables()
-	{
+	function getTables() {
 		$out = array();
 		
-		if ($this->connection)
-		{
+		if ($this->connection) {
 			$rows = $this->query('SHOW TABLES;');
 			
-			foreach ($rows as $row)
-			{
+			foreach ($rows as $row) {
 				$out[] = $row[0];
 			}
 		}
@@ -213,16 +194,13 @@ class GooDB extends Goo
 	 * @param	table name
 	 * @return	database tables array
 	 */
-	function getFields($table)
-	{
+	function getFields($table) {
 		$out = array();
 		
-		if ($this->connection)
-		{
+		if ($this->connection) {
 			$rows = $this->query('DESCRIBE ' . $table . ';');
 			
-			foreach ($rows as $row)
-			{
+			foreach ($rows as $row) {
 				$out[] = $row['Field'];
 			}
 		}
@@ -237,8 +215,7 @@ class GooDB extends Goo
 	 * @param	table name
 	 * @return	object
 	 */
-	function table($table)
-	{
+	function table($table) {
 		$table = new GooDBTable($table, $this);
 		
 		return $table;
@@ -250,19 +227,15 @@ class GooDB extends Goo
 	 * @param	optional: sets the output mode (def: 'text') [text, html]
 	 * @return	this object to string
 	 */
-	function toString($mode = '')
-	{
+	function toString($mode = '') {
 		$out = '';
 		
-		if ($mode == 'text')
-		{
+		if ($mode == 'text') {
 			// ****** Text
 			$out .= '' . $this->scheme . '://' . $this->user . ':*@' . $this->host . '/' . $this->table . "\n";
 			$out .= 'queries done: ' . $this->count . "\n";
 			$out .= 'last query: ' . $this->lastQuery . "\n";
-		}
-		else
-		{
+		} else {
 			// ****** HTML
 			$out .= '<ul>';
 			$out .= '<li><strong>DB</strong>';
@@ -282,8 +255,7 @@ class GooDB extends Goo
 	 *
 	 * @param	text to be formatted and written
 	 */
-	function _log($text)
-	{
+	function _log($text) {
 		echo '
 			<div style="font-family: Arial, Helvetica, Verdana, sans serif; margin: 20px">
 				<h2>Goo.DB: error connecting to the database </h2>
@@ -297,18 +269,16 @@ class GooDB extends Goo
 }
 
 
-class GooDBTable
-{
+class GooDBTable {
 	var $name	= '';		// table name
 	var $db		= null;		// GooDB database object
 	
 	/****************************************************************************************************
 	 * Constructor
 	 *
-	 * @param	text to be formatted and written
+	 * @param		text to be formatted and written
 	 */
-	function GooDBTable($table, &$gooDB)
-	{
+	function GooDBTable($table, &$gooDB) {
 		$this->name	= $table;
 		$this->db	= &$gooDB;
 	}
@@ -321,23 +291,20 @@ class GooDBTable
 	 *	'field2'	=> 'value'	
 	 *	);
 	 *
-	 * @param	where condition (false means INSERT)
-	 * @param	array of pairs (field => values)
-	 * @param	optional limit field (i.e. '1', '20', ...)
+	 * @param		where condition (false means INSERT)
+	 * @param		array of pairs (field => values)
+	 * @param		optional limit field (i.e. '1', '20', ...)
 	 * @return	boolean true on success
 	 */
-	function set($where, $array, $limit = '')
-	{
+	function set($where, $array, $limit = '') {
 		$out = false;
 		$quote = "'";
 		
 		if ($limit) $limit = 'LIMIT ' . $limit;
 		
-		if ($where)
-		{
+		if ($where) {
 			// ****** UPDATE
-			foreach ($array as $field => $value)
-			{
+			foreach ($array as $field => $value) {
 				$set[] = $field . ' = ' . $quote . $this->norm($value) . $quote;
 			}
 			
@@ -350,12 +317,9 @@ class GooDBTable
 				;';
 			
 			$out = $this->db->query($query);
-		}
-		else
-		{
+		} else {
 			// ****** INSERT
-			foreach ($array as $field => $value)
-			{
+			foreach ($array as $field => $value) {
 				$fields[] = $field;
 				$values[] = $this->norm($value);
 			}
@@ -378,13 +342,12 @@ class GooDBTable
 	/****************************************************************************************************
 	 * Get an array of rows from the database table.
 	 *
-	 * @param	where condition
-	 * @param	string of order bys
-	 * @param	optional limit condition (i.e. '0,25', '25,50', ...)
+	 * @param		where condition
+	 * @param		string of order bys
+	 * @param		optional limit condition (i.e. '0,25', '25,50', ...)
 	 * @return	array of rows (boolean false on failure)
 	 */
-	function get($where, $order = '', $limit = '')
-	{
+	function get($where, $order = '', $limit = '') {
 		$out = false;
 		
 		if ($limit) $limit = 'LIMIT ' . $limit;
@@ -406,12 +369,11 @@ class GooDBTable
 	/****************************************************************************************************
 	 * Deletes the specified rows from the table
 	 *
-	 * @param	where condition
-	 * @param	optional limit condition (i.e. '1', '20', ...)
-	 * @param	number of the rows deleted, boolean false on failure
+	 * @param		where condition
+	 * @param		optional limit condition (i.e. '1', '20', ...)
+	 * @param		number of the rows deleted, boolean false on failure
 	 */
-	function destroy($where, $limit = '')
-	{
+	function destroy($where, $limit = '') {
 		$out = false;
 		
 		if ($limit) $limit = 'LIMIT ' . $limit;
@@ -432,11 +394,10 @@ class GooDBTable
 	 * Count the number of rows matching the where condition. If no where condition is specified,
 	 * it returns the table length.
 	 *
-	 * @param	optional where condition
+	 * @param		optional where condition
 	 * @return	count index
 	 */
-	function count($where = true)
-	{
+	function count($where = true) {
 		return $this->db->count($this->name, $where);
 	}
 	
@@ -445,27 +406,21 @@ class GooDBTable
 	 * This function is a simple way to create standard tables. To create more complex tables use
 	 * a direct query using the DB goo.
 	 *
-	 * @param	fields sql array
-	 * @param	primary key field name
+	 * @param		fields sql array
+	 * @param		primary key field name
 	 * @return	boolean true on success
 	 */
-	function create($array)
-	{
+	function create($array) {
 		$out = false;
 		
-		if (!in_array($this->name, $this->db->getTables()))
-		{
+		if (!in_array($this->name, $this->db->getTables())) {
 			// ****** Prepare
 			$fields = array();
-			foreach ($array as $name => $value)
-			{
-				if ($value == 'key' || $value == 'KEY')
-				{
+			foreach ($array as $name => $value) {
+				if ($value == 'key' || $value == 'KEY') {
 					$fields[] = '`' . $name . '` INT UNSIGNED NOT NULL AUTO_INCREMENT';
 					$primarykey = $name;
-				}
-				else
-				{
+				} else {
 					$fields[] = '`' . $name . '` ' . $value . ' NOT NULL';
 				}
 			}
@@ -489,8 +444,7 @@ class GooDBTable
 	 *
 	 * @return	boolean true on success
 	 */
-	function drop()
-	{
+	function drop() {
 		$out = false;
 		
 		$query = '
@@ -507,25 +461,22 @@ class GooDBTable
 	 * Normalize text to be passed into db
 	 * Should avoid SQL injection attacks
 	 *
-	 * @param	text to be normalized
+	 * @param		text to be normalized
 	 * @return	normalized text
 	 */
-	function norm(&$text)
-	{
+	function norm(&$text) {
 		$out = $text;
 		
 		// Stripslashes
-	   if (get_magic_quotes_gpc())
-	   {
-		   $out = stripslashes($out);
-	   }
-	   
-	   // Quote if not integer
-	   if (!is_numeric($out))
-	   {
-		   $out = @mysql_real_escape_string($out);
-	   }
-		
+		if (get_magic_quotes_gpc()) {
+			$out = stripslashes($out);
+		}
+
+		// Quote if not integer
+		if (!is_numeric($out)) {
+			$out = @mysql_real_escape_string($out);
+		}
+
 		return $out;
 	}
 }

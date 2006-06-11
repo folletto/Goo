@@ -45,6 +45,9 @@ class GooDB extends Goo {
 	var $lastQuery = '';
 	var $lastRows = '';
 	
+	// Caches
+	var $cache_tables = array();
+	
 	/****************************************************************************************************
 	 * Constructor
 	 */
@@ -176,13 +179,19 @@ class GooDB extends Goo {
 	function getTables() {
 		$out = array();
 		
-		if ($this->connection) {
-			$rows = $this->query('SHOW TABLES;');
+		// *** Retrieve tables listing and cache
+		if (!$this->cache_tables) {
+			if ($this->connection) {
+				$rows = $this->query('SHOW TABLES;');
 			
-			foreach ($rows as $row) {
-				$out[] = $row[0];
+				foreach ($rows as $row) {
+					$this->cache_tables[] = $row[0];
+				}
 			}
 		}
+		
+		// *** Return cached values
+		$out = $this->cache_tables;
 		
 		return $out;
 	}
@@ -268,9 +277,11 @@ class GooDB extends Goo {
 	}
 }
 
-
+/****************************************************************************************************
+ * CLASS: single Database Table
+ */
 class GooDBTable {
-	var $name	= '';		// table name
+	var $name	= '';			// table name
 	var $db		= null;		// GooDB database object
 	
 	/****************************************************************************************************

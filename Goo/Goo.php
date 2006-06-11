@@ -291,7 +291,7 @@ class GooContext {
 
 /****************************************************************************************************
  * Proto class
- * Every Goo must extend this class. Do NOT use it directly.
+ * Every Goo must extend this class. Do NOT use this directly.
  *
  */
 class Goo

@@ -43,7 +43,18 @@ class GooUsers extends Goo
 		$this->dbUsers = $context->DB->table($table);
 	}
 	
+	function init() {}
+	function extend() {}
 	
+	/****************************************************************************************************
+	 * User factory method
+	 *
+	 */
+	function user($identifier) {
+		$user = new GooUsersUser($identifier, $this);
+		
+		return $user;
+	}
 	
 	/****************************************************************************************************
 	 * To String method
@@ -74,6 +85,30 @@ class GooUsers extends Goo
 		
 		return $out;
 	}
+}
+
+/****************************************************************************************************
+ * CLASS: single User
+ */
+class GooUsersUser {
+	var $id			= '';			// user identifier
+	var $users	= null;		// GooUsers object
+	
+	/****************************************************************************************************
+	 * Constructor
+	 *
+	 * @param		user name
+	 */
+	function GooUsersUser($identifier, &$gooUsers) {
+		$this->id = $identifier;
+		$this->users = $gooUsers;
+		$this->context = $gooUsers->context;
+	}
+	
+	function save() {}
+	function destroy() {}
+	function getName() {}
+	function setName() {}
 }
 
 ?>

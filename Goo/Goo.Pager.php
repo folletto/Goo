@@ -109,8 +109,6 @@ class GooPager extends Goo {
 			
 			// ****** Prepare the array
 			$this->parsed = $extra;
-			
-			global $g; $g->_dbg($this->parsed); $g->_dbg($self . " @ " . $uri . " [ " . $_SERVER['PHP_SELF']);
 		}
 		
 		return $this->parsed;

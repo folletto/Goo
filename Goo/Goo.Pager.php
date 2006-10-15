@@ -98,16 +98,19 @@ class GooPager extends Goo {
 		if (!is_array($this->parsed)) {
 			// ****** Prepare the variables to be matched
 			$self = dirname($_SERVER['PHP_SELF']) . '/';	// relative self path
-			$uri = $_SERVER['REQUEST_URI'];					// user requested URI
+			if ($self == '//') $self = '/';
+			$uri = $_SERVER['REQUEST_URI'];						// user requested URI
 			//$pathinfo = $_SERVER['PATH_INFO'];			// WP uses PATH_INFO, unset to me...
 			
 			// *** Split path from query
-			$relevant = str_replace($self, '', $uri);		// get just the 'fake' part
+			$relevant = str_replace(':' . $self, '', ':' . $uri);		// get just the 'fake' part
 			@list($path, $query) = explode('?', $relevant);	// split 'fake' part from query
 			$extra = explode('/', $path);
-		
+			
 			// ****** Prepare the array
 			$this->parsed = $extra;
+			
+			global $g; $g->_dbg($this->parsed); $g->_dbg($self . " @ " . $uri . " [ " . $_SERVER['PHP_SELF']);
 		}
 		
 		return $this->parsed;
@@ -270,8 +273,8 @@ class GooPager extends Goo {
 		$out = $text;
 		
 		// ****** Prepare
-		$path = dirname($_SERVER['PHP_SELF']) . '/';
-		
+		$path = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';
+				
 		// ****** Relativize
 		$out = preg_replace('/<a(.*)href="(.*)"/i', '<a$1href="' . $path . '$2"', $out);
 		

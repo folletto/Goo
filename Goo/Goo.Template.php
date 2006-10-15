@@ -1,7 +1,7 @@
 <?php
 /*
  * Goo Template
- * version 0.3
+ * version 0.3.1
  * 
  * Copyright (C) 2006
  * by Davide S. Casali, Alessandro Morandi
@@ -43,7 +43,7 @@ class GooTemplate extends Goo {
 		
 		// ****** Init
 		$this->path = trim($path, '/') . '/';
-		$this->selfpath = dirname($_SERVER['PHP_SELF']) . '/' . $this->path;
+		$this->selfpath = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/' . $this->path;
 		$this->partials = $this->read($this->path);
 		
 		// ****** Filters

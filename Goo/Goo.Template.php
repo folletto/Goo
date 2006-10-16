@@ -235,8 +235,9 @@ class GooTemplate extends Goo {
 		$out = preg_replace('/\<\$(\w+)\>/', '<?php echo \$$1; ?>', $out);
 		
 		// ****** Relativize
-		$out = preg_replace('/<link(.*)href="(.*)"/i', '<link$1href="' . $path . '$2"', $out);
-		$out = preg_replace('/<img(.*)src="(.*)"/i', '<img$1src="' . $path . '$2"', $out);
+		$out = preg_replace('/<link(.*)href="((?!http).*)"/i', '<link$1href="' . $path . '$2"', $out);
+		$out = preg_replace('/<img(.*)src="((?!http).*)"/i', '<img$1src="' . $path . '$2"', $out);
+		$out = preg_replace('/<script(.*)src="((?!http).*)"/i', '<script$1src="' . $path . '$2"', $out);
 		
 		return $out;
 	}

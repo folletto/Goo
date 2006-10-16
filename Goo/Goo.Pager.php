@@ -97,8 +97,7 @@ class GooPager extends Goo {
 	function parsed() {
 		if (!is_array($this->parsed)) {
 			// ****** Prepare the variables to be matched
-			$self = dirname($_SERVER['PHP_SELF']) . '/';	// relative self path
-			if ($self == '//') $self = '/';
+			$self = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';	// relative self path
 			$uri = $_SERVER['REQUEST_URI'];						// user requested URI
 			//$pathinfo = $_SERVER['PATH_INFO'];			// WP uses PATH_INFO, unset to me...
 			
@@ -272,9 +271,9 @@ class GooPager extends Goo {
 		
 		// ****** Prepare
 		$path = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';
-				
+		
 		// ****** Relativize
-		$out = preg_replace('/<a(.*)href="(.*)"/i', '<a$1href="' . $path . '$2"', $out);
+		$out = preg_replace('/<a(.*)href="((?!http).*)"/i', '<a$1href="' . $path . '$2"', $out);
 		
 		return $out;
 	}

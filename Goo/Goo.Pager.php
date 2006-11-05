@@ -52,7 +52,7 @@ class GooPager extends Goo {
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
-		$this->path = trim($path, '/') . '/';
+		$this->path = rtrim($path, '/') . '/';
 		
 		// ****** Filters
 		$this->context->setFilter('template', array($this, 'filterTemplate'));

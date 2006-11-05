@@ -29,7 +29,7 @@
  */
 
 class GooTemplate extends Goo {
-	var $path		= '';		// template name (path)
+	var $path			= '';		// template name (path)
 	var $selfpath	= '';		// template path, relative to site root
 	var $count		= 0;		// count template renders
 	
@@ -42,7 +42,7 @@ class GooTemplate extends Goo {
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
-		$this->path = trim($path, '/') . '/';
+		$this->path = rtrim($path, '/') . '/';
 		$this->selfpath = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/' . $this->path;
 		$this->partials = $this->read($this->path);
 		

@@ -31,7 +31,8 @@
 class GooCache extends Goo {
 	var $path			= '';		// cache name (path)
 	var $selfpath	= '';		// cache path, relative to site root
-	var $hits			= 0;		// count cache hits
+	var $hit			= 0;		// count cache hits
+	var $miss			= 0;		// count cache misses
 
 	var $cache		= array();	// cache
 
@@ -58,7 +59,9 @@ class GooCache extends Goo {
 	 * @return	the content of the cache
 	 */
 	function get($name, $force = false) {
-		return $this->context->filter('unserialize', $this->getCache($name, $force));
+		$cache = $this->context->filter('unserialize', $this->getCache($name, $force));
+		$content = $cache['content'];
+		return $content;
 	}
 	
 	/****************************************************************************************************
@@ -68,8 +71,16 @@ class GooCache extends Goo {
 	 * @return	positive values or true on success
 	 */
 	function set($name, $content) {
-		if (!($content === null)) $content = $this->context->filter('serialize', $content);
-		return $this->setCache($name, $content);
+		if ($content === null) {
+			$cache_serialized = null;
+		} else {
+			$cache = array(
+				'time' => mktime(),
+				'content' => $content
+			);
+			$cache_serialized = $this->context->filter('serialize', $cache);
+		}
+		return $this->setCache($name, $cache_serialized);
 	}
 	
 	/****************************************************************************************************
@@ -82,9 +93,12 @@ class GooCache extends Goo {
 	function getCache($name, $force = false) {
 		$out = '';
 		
+		$this->hit++;
 		if ($force || !isset($this->cache[$name])) {
 			// ****** (Re)Load in memory cache
 			$this->cache[$name] = $this->readFile($this->path . $name . '.cache');
+			$this->hit--;
+			$this->miss++;
 		}
 		
 		$out = $this->cache[$name];
@@ -183,7 +197,7 @@ class GooCache extends Goo {
 	 * @return	output serialized text
 	 */
 	function filterCacheSerializer($text) {
-		return serialize($text);
+		return @serialize($text);
 	}
 	
 	/****************************************************************************************************
@@ -193,7 +207,36 @@ class GooCache extends Goo {
 	 * @return	output plain text
 	 */
 	function filterCacheUnSerializer($text) {
-		return unserialize($text);
+		return @unserialize($text);
+	}
+	
+	/****************************************************************************************************
+	 * To String method
+	 *
+	 * @param		optional: sets the output mode (def: 'html') [text, html]
+	 * @return	this object to string
+	 */
+	function toString($mode = '') {
+		$out = '';
+		
+		if ($mode == 'text') {
+			// ****** Text
+			$out .= 'Cache: ' . "\n";
+			$out .= 'template name: ' . $this->path . "\n";
+			$out .= 'template renders: ' . $this->count . "\n";
+		} else {
+			// ****** HTML
+			$out .= '<ul>';
+			$out .= '<li><strong>Cache</strong>';
+			$out .= '<ul>';
+			$out .= '<li>cache path: ' . $this->path . '</li>';
+			$out .= '<li>mem cache hits: ' . $this->hit . '</li>';
+			$out .= '<li>mem cache misses: ' . $this->miss . '</li>';
+			$out .= '</ul></li>';
+			$out .= '</ul>';
+		}
+		
+		return $out;
 	}
 }
 

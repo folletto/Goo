@@ -188,7 +188,7 @@ class GooPager extends Goo {
 	 */
 	function page($purl, $matchindex) {
 		$name = join('.', array_slice($purl, 0, $matchindex));
-		$root = dirname($_SERVER['PHP_SELF']) . '/';
+		$root = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';
 		$path = $this->path . $name . '.php';
 		
 		// *** Preparing some variables in order to be usable easily in the page
@@ -228,8 +228,8 @@ class GooPager extends Goo {
 	 */
 	function makeHTAccess() {
 		$out = false;
-		$self = dirname($_SERVER['PHP_SELF']) . '/';	// relative self path
-		$path = dirname($_SERVER['SCRIPT_FILENAME']) . '/'; // also PATH_TRANSLATED?
+		$self = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';	// relative self path
+		$path = rtrim(dirname($_SERVER['SCRIPT_FILENAME']), '/') . '/'; // also PATH_TRANSLATED?
 		$htaccess = $path . '.htaccess';
 		
 		if (file_exists($htaccess) && is_writable($htaccess)

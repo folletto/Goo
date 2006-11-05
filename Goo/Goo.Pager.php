@@ -41,7 +41,7 @@
  */
 
 class GooPager extends Goo {
-	var $path = null;		// pages folder
+	var $path = null;			// pages folder
 	var $parsed = null;		// parsed URI
 	var $binds = array();	// declared binds array
 	
@@ -62,8 +62,8 @@ class GooPager extends Goo {
 	 * Bind an URI 'root' relative path to a specific handler
 	 * This in fact binds a function to a specific name 'directory' in the URI (mod_rewrite...)
 	 * 
-	 * @param	URI string, name to be matched
-	 * @param	handler
+	 * @param		URI string, name to be matched
+	 * @param		handler
 	 */
 	function setBind($name, $handler) {
 		if ($name && $handler) {
@@ -74,7 +74,7 @@ class GooPager extends Goo {
 	/****************************************************************************************************
 	 * Returns the bind on an URI 'root' relative path to a specific handler
 	 * 
-	 * @param	URI string, name to be matched
+	 * @param		URI string, name to be matched
 	 * @return	handler
 	 */
 	function getBind($name) {
@@ -168,9 +168,9 @@ class GooPager extends Goo {
 	/****************************************************************************************************
 	 * Handle the specified tag chunk.
 	 * 
-	 * @param	handler (function name string or object array($object, 'name'))
-	 * @param	parsed url array
-	 * @param	matching parts of the array (0 = none)
+	 * @param		handler (function name string or object array($object, 'name'))
+	 * @param		parsed url array
+	 * @param		matching parts of the array (0 = none)
 	 */
 	function handle($handler, $purl, $matchindex) {
 		if (is_array($handler)) {
@@ -183,7 +183,7 @@ class GooPager extends Goo {
 	/****************************************************************************************************
 	 * Load a specific page from the specified path.
 	 * 
-	 * @param	page name
+	 * @param		page name
 	 * @return	boolean, true on success
 	 */
 	function page($purl, $matchindex) {
@@ -205,6 +205,20 @@ class GooPager extends Goo {
 			//       from the included page.
 			return false;
 		}
+	}
+	
+	
+	/****************************************************************************************************
+	 * Includes a specific page.
+	 * 
+	 * @param		page name
+	 * @return	boolean, true on success
+	 */
+	function render($name) {
+		$purl = explode('.', $name);
+		$matchindex = sizeof($purl);
+		
+		return $this->page($purl, $matchindex);
 	}
 	
 	/****************************************************************************************************

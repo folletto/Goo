@@ -31,9 +31,11 @@
 class GooCache extends Goo {
 	var $path			= '';		// cache name (path)
 	var $selfpath	= '';		// cache path, relative to site root
+	var $expire		= 300;		// delta expiration default time in seconds
+	
 	var $hit			= 0;		// count cache hits
 	var $miss			= 0;		// count cache misses
-
+	
 	var $cache		= array();	// cache
 
 	/****************************************************************************************************
@@ -49,6 +51,26 @@ class GooCache extends Goo {
 		// ****** Filters
 		$this->context->setFilter('serialize', array($this, 'filterCacheSerializer'));
 		$this->context->setFilter('unserialize', array($this, 'filterCacheUnSerializer'));
+	}
+	
+	/****************************************************************************************************
+	 * Checks if a specific cache has expired.
+	 *
+	 * @param		cache identifier
+	 * @param		expiration delta in seconds
+	 * @param		optional, force the loading from file (avoids runtime caching, default false)
+	 * @return	boolean true if expired
+	 */
+	function isExpired($name, $delta = false, $force = false) {
+		$cache = $this->context->filter('unserialize', $this->getCache($name, $force));
+		
+		if (!$delta) $delta = $this->expire;
+		
+		if (mktime() > $cache['time'] + $delta) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/****************************************************************************************************

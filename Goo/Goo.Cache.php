@@ -54,6 +54,15 @@ class GooCache extends Goo {
 	}
 	
 	/****************************************************************************************************
+	 * Sets the default expiration delta time (in seconds).
+	 *
+	 * @param		default expiration delta time (in seconds)
+	 */
+	function expireIn($delta) {
+		$this->expire = $delta;
+	}
+	
+	/****************************************************************************************************
 	 * Checks if a specific cache has expired.
 	 *
 	 * @param		cache identifier

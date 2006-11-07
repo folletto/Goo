@@ -33,8 +33,8 @@ class GooCache extends Goo {
 	var $selfpath	= '';		// cache path, relative to site root
 	var $expire		= 300;		// delta expiration default time in seconds
 	
-	var $hit			= 0;		// count cache hits
-	var $miss			= 0;		// count cache misses
+	var $hit			= 0;		// count mem cache hits
+	var $miss			= 0;		// count mem cache misses
 	
 	var $cache		= array();	// cache
 
@@ -64,25 +64,44 @@ class GooCache extends Goo {
 	function isExpired($name, $delta = false, $force = false) {
 		$cache = $this->context->filter('unserialize', $this->getCache($name, $force));
 		
-		if (!$delta) $delta = $this->expire;
-		
-		if (mktime() > $cache['time'] + $delta) {
-			return true;
-		} else {
-			return false;
-		}
+		return $this->isExpiredCache($cache, $delta);
+	}
+	
+	/****************************************************************************************************
+	 * Checks if a specific cache object has expired.
+	 *
+	 * @param		cache object array
+	 * @param		expiration delta in seconds
+	 * @return	boolean true if expired
+	 */
+	function isExpiredCache($cache, $delta) {
+		if ($delta === false) $delta = $this->expire;
+		if (is_array($cache))
+			if (mktime() > $cache['time'] + $delta)
+				return true;
+		return false;
 	}
 	
 	/****************************************************************************************************
 	 * Loads the cache.
+	 * Optionally checks for 
 	 *
 	 * @param		cache identifier
+	 * @param		optional, expiration delta in seconds
 	 * @param		optional, force the loading from file (avoids runtime caching, default false)
-	 * @return	the content of the cache
+	 * @return	the content of the cache, boolean false on expiration
 	 */
-	function get($name, $force = false) {
+	function get($name, $delta = false, $force = false) {
+		$content = false;
+		
 		$cache = $this->context->filter('unserialize', $this->getCache($name, $force));
-		$content = $cache['content'];
+		
+		// ****** Check if not expired, return the content
+		if (is_array($cache))
+			if (!$this->isExpiredCache($cache, $delta))
+				$content = $cache['content'];
+		
+		if ($content === false) $this->miss++; else $this->hit++;
 		return $content;
 	}
 	
@@ -113,14 +132,11 @@ class GooCache extends Goo {
 	 * @return	the content of the cache
 	 */
 	function getCache($name, $force = false) {
-		$out = '';
+		$out = false;
 		
-		$this->hit++;
 		if ($force || !isset($this->cache[$name])) {
 			// ****** (Re)Load in memory cache
 			$this->cache[$name] = $this->readFile($this->path . $name . '.cache');
-			$this->hit--;
-			$this->miss++;
 		}
 		
 		$out = $this->cache[$name];
@@ -244,16 +260,15 @@ class GooCache extends Goo {
 		if ($mode == 'text') {
 			// ****** Text
 			$out .= 'Cache: ' . "\n";
-			$out .= 'template name: ' . $this->path . "\n";
-			$out .= 'template renders: ' . $this->count . "\n";
+			$out .= 'cache path: ' . $this->path . "\n";
 		} else {
 			// ****** HTML
 			$out .= '<ul>';
 			$out .= '<li><strong>Cache</strong>';
 			$out .= '<ul>';
 			$out .= '<li>cache path: ' . $this->path . '</li>';
-			$out .= '<li>mem cache hits: ' . $this->hit . '</li>';
-			$out .= '<li>mem cache misses: ' . $this->miss . '</li>';
+			$out .= '<li>cache hit: ' . $this->hit . '</li>';
+			$out .= '<li>cache miss: ' . $this->miss . '</li>';
 			$out .= '</ul></li>';
 			$out .= '</ul>';
 		}

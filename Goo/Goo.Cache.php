@@ -31,7 +31,7 @@
 class GooCache extends Goo {
 	var $path			= '';		// cache name (path)
 	var $selfpath	= '';		// cache path, relative to site root
-	var $expire		= 300;		// delta expiration default time in seconds
+	var $ttl			= 300;	// delta expiration default time in seconds (default 5 sec)
 	
 	var $hit			= 0;		// count mem cache hits
 	var $miss			= 0;		// count mem cache misses
@@ -58,8 +58,8 @@ class GooCache extends Goo {
 	 *
 	 * @param		default expiration delta time (in seconds)
 	 */
-	function expireIn($delta) {
-		$this->expire = $delta;
+	function expireAfter($ttl) {
+		$this->ttl = $ttl;
 	}
 	
 	/****************************************************************************************************
@@ -70,10 +70,10 @@ class GooCache extends Goo {
 	 * @param		optional, force the loading from file (avoids runtime caching, default false)
 	 * @return	boolean true if expired
 	 */
-	function isExpired($name, $delta = false, $force = false) {
+	function isExpired($name, $ttl = false, $force = false) {
 		$cache = $this->context->filter('unserialize', $this->getCache($name, $force));
 		
-		return $this->isExpiredCache($cache, $delta);
+		return $this->isExpiredCache($cache, $ttl);
 	}
 	
 	/****************************************************************************************************
@@ -83,10 +83,10 @@ class GooCache extends Goo {
 	 * @param		expiration delta in seconds
 	 * @return	boolean true if expired
 	 */
-	function isExpiredCache($cache, $delta) {
-		if ($delta === false) $delta = $this->expire;
+	function isExpiredCache($cache, $ttl) {
+		if ($ttl === false) $ttl = $this->ttl;
 		if (is_array($cache))
-			if (mktime() > $cache['time'] + $delta)
+			if (mktime() > $cache['time'] + $ttl)
 				return true;
 		return false;
 	}
@@ -100,14 +100,14 @@ class GooCache extends Goo {
 	 * @param		optional, force the loading from file (avoids runtime caching, default false)
 	 * @return	the content of the cache, boolean false on expiration
 	 */
-	function get($name, $delta = false, $force = false) {
+	function get($name, $ttl = false, $force = false) {
 		$content = false;
 		
 		$cache = $this->context->filter('unserialize', $this->getCache($name, $force));
 		
 		// ****** Check if not expired, return the content
 		if (is_array($cache))
-			if (!$this->isExpiredCache($cache, $delta))
+			if (!$this->isExpiredCache($cache, $ttl))
 				$content = $cache['content'];
 		
 		if ($content === false) $this->miss++; else $this->hit++;

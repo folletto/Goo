@@ -187,11 +187,10 @@ class GooPager extends Goo {
 	 * @return	boolean, true on success
 	 */
 	function page($purl, $matchindex) {
+		// *** Preparing some variables in order to be usable easily in the page
 		$name = join('.', array_slice($purl, 0, $matchindex));
 		$root = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';
 		$path = $this->path . $name . '.php';
-		
-		// *** Preparing some variables in order to be usable easily in the page
 		$context = $this->context;
 		
 		if ($path && file_exists($path)) {

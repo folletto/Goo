@@ -169,6 +169,10 @@ class GooTemplate extends Goo {
 	 * @param	item array
 	 */
 	function renderHelperPartial($partial, $item) {
+		// *** Preparing some variables in order to be usable easily in the page
+		$root = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';
+		$context = $this->context;
+		// *** Of course, also the user array must be extract()ed
 		extract($item);
 		
 		// *** Evaluates the string

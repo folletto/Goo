@@ -1,7 +1,7 @@
 <?php
 /*
  * Goo Template
- * version 0.3.1
+ * version 0.3.2
  * 
  * Copyright (C) 2006
  * by Davide S. Casali, Alessandro Morandi
@@ -138,7 +138,7 @@ class GooTemplate extends Goo {
 		$this->count++;
 		
 		// ****** Select renderer
-		if ($fx)
+		if ($fx && !is_array($fx))
 			$renderer = array($this, 'renderHelper' . $fx . '');
 		else if (is_array($fx))
 			$renderer = $fx;
@@ -162,6 +162,18 @@ class GooTemplate extends Goo {
 	}
 	
 	/****************************************************************************************************
+	 * Get a template part.
+	 * Buffers the render() function into a variable. Uses OB functions.
+	 *
+	 * @param	template part name identifier
+	 * @param	optional array to be inserted (uni/bi-dimensional)
+	 * @param	optional render function name callback (def: Partial) [Partial, File]
+	 */
+	function get($partial, $array = null, $fx = null) {
+		return $this->getOutputOf(array($this, 'render'), $partial, $array, $fx);
+	}
+	
+	/****************************************************************************************************
 	 * Partials Array Renderer
 	 * Renderer for the render() loop.
 	 * 
@@ -177,7 +189,6 @@ class GooTemplate extends Goo {
 		
 		// *** Evaluates the string
 		$code = $this->partials[$partial];
-		/*$code = preg_replace('/\<\$(\w+)\>/', '<?php echo \$$1; ?>', $code);*/
 		$code = $this->context->filter('template', $code);
 		
 		// partials are HTML mainly, so we close the php tags before evaluating.

@@ -287,6 +287,7 @@ class GooPager extends Goo {
 		
 		// ****** Relativize
 		$out = preg_replace('/<a(.*)href="((?!http).*)"/i', '<a$1href="' . $path . '$2"', $out);
+		//$out = preg_replace('/<form(.*)action="((?!http).*)"/i', '<form$1action="' . $path . '$2"', $out);
 		
 		return $out;
 	}

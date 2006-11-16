@@ -71,11 +71,11 @@ class GooDB extends Goo {
 		$this->uri = $uri; //preg_replace('/(\w+:\/\/\w*)(:\w*)?(.*)/', '$1:***$3', $uri);
 		$parsed = parse_url($uri);
 		
-		$this->scheme = $parsed['scheme'];
-		$this->host = $parsed['host'];
+		$this->scheme = @$parsed['scheme'];
+		$this->host = @$parsed['host'];
 		$this->user = @$parsed['user'];
 		$this->pass = @$parsed['pass'];
-		$this->name = substr($parsed['path'], 1);
+		$this->name = @substr(@$parsed['path'], 1);
 		
 		// ****** Check
 		if (trim($this->name) == "") $err .= 'Missing database name. ';

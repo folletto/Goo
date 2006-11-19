@@ -241,7 +241,7 @@ class GooDB extends Goo {
 		
 		if ($mode == 'text') {
 			// ****** Text
-			$out .= '' . $this->scheme . '://' . $this->user . ':*@' . $this->host . '/' . $this->table . "\n";
+			$out .= '' . $this->scheme . '://' . $this->user . ':*@' . $this->host . '/' . $this->path . "\n";
 			$out .= 'queries done: ' . $this->count . "\n";
 			$out .= 'last query: ' . $this->lastQuery . "\n";
 		} else {
@@ -249,7 +249,7 @@ class GooDB extends Goo {
 			$out .= '<ul>';
 			$out .= '<li><strong>DB</strong>';
 			$out .= '<ul>';
-			$out .= '<li>' . $this->scheme . '://' . $this->user . ':*@' . $this->host . '/' . $this->table . '</li>';
+			$out .= '<li>' . $this->scheme . '://' . $this->user . ':*@' . $this->host . '/' . $this->path . '</li>';
 			$out .= '<li>queries done: ' . $this->count . '</li>';
 			$out .= '<li>last query: ' . $this->lastQuery . '</li>';
 			$out .= '</ul></li>';

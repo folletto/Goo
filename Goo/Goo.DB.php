@@ -45,6 +45,8 @@ class GooDB extends Goo {
 	var $lastQuery = '';
 	var $lastRows = '';
 	
+	//var $quote = '`'; // TODO: check if is it possible to quote the fields name (to avoid keywords)
+	
 	// Caches
 	var $cache_tables = array();
 	

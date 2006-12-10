@@ -31,7 +31,7 @@
 class GooCache extends Goo {
 	var $path			= '';		// cache name (path)
 	var $selfpath	= '';		// cache path, relative to site root
-	var $ttl			= 300;	// delta expiration default time in seconds (default 5 sec)
+	var $ttl			= 300;	// delta expiration default time in seconds (default 5 min)
 	
 	var $hit			= 0;		// count mem cache hits
 	var $miss			= 0;		// count mem cache misses

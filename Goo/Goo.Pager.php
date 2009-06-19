@@ -97,7 +97,7 @@ class GooPager extends Goo {
 	function parsed() {
 		if (!is_array($this->parsed)) {
 			// ****** Prepare the variables to be matched
-			$self = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';	// relative self path
+			$self = str_replace(" ", "%20", rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/');	// relative self path
 			$uri = $_SERVER['REQUEST_URI'];						// user requested URI
 			//$pathinfo = $_SERVER['PATH_INFO'];			// WP uses PATH_INFO, unset to me...
 			
@@ -238,10 +238,10 @@ class GooPager extends Goo {
 			$content .= "\n\n";
 			$content .= '<IfModule mod_rewrite.c>' . "\n";
 			$content .= '    RewriteEngine On' . "\n";
-			$content .= '    RewriteBase ' . $self . "\n";
+			$content .= '    RewriteBase ' . str_replace(" ", "%20", $self) . "\n";
 			$content .= '    RewriteCond %{REQUEST_FILENAME} !-f' . "\n";
 			$content .= '    RewriteCond %{REQUEST_FILENAME} !-d' . "\n";
-			$content .= '    RewriteRule . ' . $self . 'index.php [L]' . "\n";
+			$content .= '    RewriteRule . ' . str_replace(" ", "\ ", $self) . 'index.php [L]' . "\n";
 			$content .= '</IfModule>' . "\n";
 			$content .= "\n";
 			

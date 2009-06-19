@@ -79,7 +79,7 @@ echo '<p>There\'s also a <a href="tests/sub">subpage</a>.';
 	);
 	
 	$tmpid = $dbTest->set(false, array('Titolo' => 'Vangelis Surely Docet', 'Contenuto' => 'Indeed he does.', 'Quanto' => intval(time()) ));
-	$items = $dbTest->get(true);
+	$items = $dbTest->get();
 	$context->_dbg($items);
 	$dbTest->destroy('test3id = ' . $tmpid, 1);
 }

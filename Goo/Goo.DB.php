@@ -387,7 +387,7 @@ class GooDBTable {
 	 * @param		optional limit condition (i.e. '0,25', '25,50', ...)
 	 * @return	array of rows (boolean false on failure)
 	 */
-	function get($where, $order = '', $limit = '') {
+	function get($where = true, $order = '', $limit = '') {
 		$out = false;
 		
 		if ($limit) $limit = 'LIMIT ' . $limit;
@@ -408,7 +408,6 @@ class GooDBTable {
 			$new = array();
 			foreach ($out as $i => $row) {
 			  foreach ($row as $field => $value) {
-			    $this->db->context->_dbg($this->db2i($field));
 				  $new[$i][$this->db2i($field)] = $value;
 			  }
 		  }

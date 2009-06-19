@@ -28,26 +28,51 @@
  ****************************************************************************************************
  */
 
-class GooUsers extends Goo
-{
+class GooUsers extends Goo {
 	var $dbUsers = null;	// users table object
+	
+	// This array maps the fields used in the User class to the field names in the database table
+	var $mapping = array(
+		'uid'					=> 'uid', 
+		'User'				=> 'User',
+		'Pass'				=> 'Pass',
+		'Nick'				=> 'Nick',
+		'EMail'				=> 'EMail',
+		'SessionHash'	=> 'SessionHash',
+		'LastLogin'		=> 'LastLogin'
+		);
 	
 	/****************************************************************************************************
 	 * Constructor
 	 */
-	function GooUsers(&$context, $table)
-	{
+	function GooUsers(&$context, $table) {
 		$this->Goo($context); // Super Constructor
 		
 		// ****** Init
 		$this->dbUsers = $context->DB->table($table);
+		$this->selfInstall();
 	}
 	
-	function init() {}
-	function extend() {}
+	/****************************************************************************************************
+	 * DataBase initialization
+	 * 
+	 */
+	function selfInstall() {
+		$this->dbUsers->create(array(
+			'uid'					=> 'key', 
+			'User'				=> 'varchar(32)',
+			'Pass'				=> 'varchar(32)',
+			'Nick'				=> 'varchar(50)',
+			'EMail'				=> 'varchar(60)',
+			'SessionHash'	=> 'varchar(32)',
+			'LastLogin'		=> 'datetime'
+			));
+	}
+	
+	function extend() { /* Stub */ }
 	
 	/****************************************************************************************************
-	 * User factory method
+	 * Creates the PHP object to interact with a specific user.
 	 *
 	 */
 	function user($identifier) {
@@ -59,21 +84,17 @@ class GooUsers extends Goo
 	/****************************************************************************************************
 	 * To String method
 	 *
-	 * @param	optional: sets the output mode (def: 'html') [text, html]
+	 * @param		optional: sets the output mode (def: 'html') [text, html]
 	 * @return	this object to string
 	 */
-	function toString($mode = '')
-	{
+	function toString($mode = '') {
 		$out = '';
 		
-		if ($mode == 'text')
-		{
+		if ($mode == 'text') {
 			// ****** Text
 			$out .= 'Users: ' . "\n";
 			$out .= 'database table: ' . $this->dbUsers->name . "\n";
-		}
-		else
-		{
+		} else {
 			// ****** HTML
 			$out .= '<ul>';
 			$out .= '<li><strong>Users</strong>';
@@ -91,8 +112,9 @@ class GooUsers extends Goo
  * CLASS: single User
  */
 class GooUsersUser {
-	var $id			= '';			// user identifier
-	var $users	= null;		// GooUsers object
+	var $id				= '';			// user identifier
+	var $users		= null;		// GooUsers object
+	var $context	= null;		// Goo context
 	
 	/****************************************************************************************************
 	 * Constructor

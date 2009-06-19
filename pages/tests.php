@@ -54,7 +54,7 @@ echo '<p>There\'s also a <a href="tests/sub">subpage</a>.';
 		'Content'	=> 'text',
 		'HowMuch'	=> 'int'
 		));
-
+	
 	if ($dbTest->count() < 2)
 	{
 		$dbTest->set(false, array('Title' => 'Vangelis Docet', 'Content' => 'Indeed he does.', 'HowMuch' => '10'));
@@ -62,8 +62,26 @@ echo '<p>There\'s also a <a href="tests/sub">subpage</a>.';
 	}
 
 	$items = $dbTest->get(true, 'HowMuch DESC');
-
+	
 	$context->Template->render('items', $items);
+}
+
+// ****** Database Mapping Example
+{
+  echo '<hr/>';
+  
+	$dbTest = $context->DB->table('goo_test');
+	$dbTest->mapping = array(
+		'id' => 'test3id',
+		'Titolo' => 'Title',
+		'Contenuto' => 'Content',
+		'Quanto' => 'HowMuch'
+	);
+	
+	$tmpid = $dbTest->set(false, array('Titolo' => 'Vangelis Surely Docet', 'Contenuto' => 'Indeed he does.', 'Quanto' => intval(time()) ));
+	$items = $dbTest->get(true);
+	$context->_dbg($items);
+	$dbTest->destroy('test3id = ' . $tmpid, 1);
 }
 
 ?>

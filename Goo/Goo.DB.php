@@ -1,9 +1,9 @@
 <?php
 /*
  * Goo DataBase
- * version 0.1
+ * version 0.2
  * 
- * Copyright (C) 2006
+ * Copyright (C) 2006-2009
  * by Davide S. Casali
  * www.digitalhymn.com
  *
@@ -29,6 +29,28 @@
  *
  ****************************************************************************************************
  */
+ 
+ /*
+  * USAGE:
+  *
+  * Initialize with GooContext:
+  *   $context = new GooContext(array(
+  *     'DB' => 'mysql://user:pass@server/name',
+  *   ));
+  *
+  * Get the table you want to work with:
+  *   $table = $context->DB->table('table_name');
+  *
+  * Add an item:
+  *   $table->set(false, array('Title' => 'value', 'Content' => 'value', 'IntegerField' => '10'));
+  *
+  * Update an item:
+  *   $table->set('id = 5', array('Title' => 'value', 'Content' => 'value', 'IntegerField' => '12'));
+  *
+  * Get a row:
+  *   $table->get('id = 5');
+  *
+  */
 
 class GooDB extends Goo {
 	var $connection = null;
@@ -136,10 +158,12 @@ class GooDB extends Goo {
 				} else {
 					// *** INSERT/UPDATE/DELETE/REPLACE
 					$this->lastRows = @mysql_affected_rows($this->connection);
-					if ($result === true)
-						$out = $this->lastRows;
-					else
+					if ($result === true) {
+						$out = mysql_insert_id($this->connection);
+						if ($out === 0) $out = true;
+					} else {
 						$out = $result;
+					}
 				}
 			}
 		}
@@ -283,8 +307,10 @@ class GooDB extends Goo {
  * CLASS: single Database Table
  */
 class GooDBTable {
-	var $name	= '';			// table name
-	var $db		= null;		// GooDB database object
+	var $name	= '';				// table name
+	var $db		= null;			// GooDB database object
+	
+	var $mapping = null;	// optional mapping feature ('interface name' => 'field_db_name')
 	
 	/****************************************************************************************************
 	 * Constructor
@@ -313,12 +339,13 @@ class GooDBTable {
 		$out = false;
 		$quote = "'";
 		
+		// ****** More
 		if ($limit) $limit = 'LIMIT ' . $limit;
 		
 		if ($where) {
 			// ****** UPDATE
 			foreach ($array as $field => $value) {
-				$set[] = $field . ' = ' . $quote . $this->norm($value) . $quote;
+				$set[] = $this->i2db($field) . ' = ' . $quote . $this->norm($value) . $quote;
 			}
 			
 			// *** Query
@@ -333,7 +360,7 @@ class GooDBTable {
 		} else {
 			// ****** INSERT
 			foreach ($array as $field => $value) {
-				$fields[] = $field;
+				$fields[] = $this->i2db($field);
 				$values[] = $this->norm($value);
 			}
 			
@@ -375,6 +402,18 @@ class GooDBTable {
 			;';
 		
 		$out = $this->db->query($query);
+		
+		// ****** Mapping
+		if (is_array($this->mapping)) {
+			$new = array();
+			foreach ($out as $i => $row) {
+			  foreach ($row as $field => $value) {
+			    $this->db->context->_dbg($this->db2i($field));
+				  $new[$i][$this->db2i($field)] = $value;
+			  }
+		  }
+			$out = $new;
+		}
 		
 		return $out;
 	}
@@ -468,6 +507,31 @@ class GooDBTable {
 		$out = $this->db->query($query);
 		
 		return $out;
+	}
+	
+	/****************************************************************************************************
+	 * Maps a passed field name to the DB name (Interface Name -> DB Name)
+	 * Uses the mapping array.
+	 *
+	 * @param		field name
+	 * @return	new mapped name, if any (otherwise returns un-mapped name)
+	 */
+	function i2db($field) {
+		if (isset($this->mapping[$field])) return $this->mapping[$field];
+		return $field;
+	}
+	
+	/****************************************************************************************************
+	 * Maps a passed DB name to the field name (DB Name -> Interface Name)
+	 * Uses the mapping array.
+	 *
+	 * @param		DB field name
+	 * @return	new mapped name, if any (otherwise returns un-mapped name)
+	 */
+	function db2i($field) {
+	  $mappedkey = array_search($field, $this->mapping);
+		if ($mappedkey) return $mappedkey;
+		return $field;
 	}
 	
 	/****************************************************************************************************

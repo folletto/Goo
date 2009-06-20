@@ -78,10 +78,11 @@ echo '<p>There\'s also a <a href="tests/sub">subpage</a>.';
 		'Quanto' => 'HowMuch'
 	);
 	
-	$tmpid = $dbTest->set(false, array('Titolo' => 'Vangelis Surely Docet', 'Contenuto' => 'Indeed he does.', 'Quanto' => intval(time()) ));
-	$items = $dbTest->get();
+	$tmpid = $dbTest->set(false, array('Titolo' => 'Vangelis Surely Docet', 'Contenuto' => 'Indeed he does.', 'Quanto' => 1 ));
+	$dbTest->set($tmpid, array('Quanto' => intval(time()) ));
+	$items = $dbTest->get($tmpid);
 	$context->_dbg($items);
-	$dbTest->destroy('test3id = ' . $tmpid, 1);
+	$dbTest->destroy($tmpid);
 }
 
 ?>

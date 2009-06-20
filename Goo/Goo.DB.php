@@ -310,6 +310,9 @@ class GooDBTable {
 	var $name	= '';				// table name
 	var $db		= null;			// GooDB database object
 	
+	var $idField = null;  // defines the name for the auto-id feature (where fields passed as just integer)
+	var $fields = null;   // defines an array containing all the fields
+	
 	var $mapping = null;	// optional mapping feature ('interface name' => 'field_db_name')
 	
 	/****************************************************************************************************
@@ -320,6 +323,9 @@ class GooDBTable {
 	function GooDBTable($table, &$gooDB) {
 		$this->name	= $table;
 		$this->db	= &$gooDB;
+		
+		$this->fields = $this->db->getFields($this->name);
+		$this->idField = $this->fields[0];
 	}
 	
 	/****************************************************************************************************
@@ -341,6 +347,7 @@ class GooDBTable {
 		
 		// ****** More
 		if ($limit) $limit = 'LIMIT ' . $limit;
+		if ($where && is_int($where) && $this->idField) $where = $this->idField . ' = ' . $where;
 		
 		if ($where) {
 			// ****** UPDATE
@@ -390,8 +397,10 @@ class GooDBTable {
 	function get($where = true, $order = '', $limit = '') {
 		$out = false;
 		
+		// ****** More
 		if ($limit) $limit = 'LIMIT ' . $limit;
 		if ($order) $order = 'ORDER BY ' . $order;
+		if ($where && is_int($where) && $this->idField) $where = $this->idField . ' = ' . $where;
 		
 		$query = '
 			SELECT *
@@ -427,7 +436,12 @@ class GooDBTable {
 	function destroy($where, $limit = '') {
 		$out = false;
 		
+		// ****** More
 		if ($limit) $limit = 'LIMIT ' . $limit;
+		if ($where && is_int($where) && $this->idField) {
+		  $where = $this->idField . ' = ' . $where;
+		  $limit = 'LIMIT 1';
+		}
 		
 		$query = '
 			DELETE

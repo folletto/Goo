@@ -235,9 +235,11 @@ class GooDB extends Goo {
 		if ($this->connection) {
 			$rows = $this->query('DESCRIBE ' . $table . ';');
 			
-			foreach ($rows as $row) {
-				$out[] = $row['Field'];
-			}
+			if ($rows) {
+  			foreach ($rows as $row) {
+  				$out[] = $row['Field'];
+  			}
+  		}
 		}
 		
 		return $out;
@@ -325,7 +327,7 @@ class GooDBTable {
 		$this->db	= &$gooDB;
 		
 		$this->fields = $this->db->getFields($this->name);
-		$this->idField = $this->fields[0];
+		if (isset($this->fields[0])) $this->idField = $this->fields[0];
 	}
 	
 	/****************************************************************************************************

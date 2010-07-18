@@ -1,0 +1,20 @@
+Goo project
+
+Goo project is a extreme lightweight PHP object oriented framework born on the ashes of phpGolem, designed to automate some simple tasks in the PHP development process. It's designed to be reusable at a very low level, making it viable in any context with a minimal overhead.
+
+This framework is being designed following those guidelines:
+. simpleness: the framework is easy to be used (if you know php, of course)
+. extensibility: the framework is completely modular from the ground up
+. extreme lightness: the framework is designed to use just the resources you need, no more huge classes just to perform simple tasks
+
+
+
+Simple example
+
+The structure is simple: a single item called Goo Context (or, simply, Context) will load all the required factory objects (Goos).
+In the following example, the Context is initialized with the DB Goo (that is taking the URI of a database). Then, the DB Goo is used to take a reference to a Table object and it's used to get an array of all the rows in the table:
+
+  include "Goo/Goo.php";
+  $context = new GooContext(array('DB' => 'mysql://user:pass@localhost/goo');
+  $users = $context->DB->table("users");
+  $users_array = $users->get(true);

@@ -248,7 +248,7 @@ class GooPager extends Goo {
 			// ****** Existence check
 			$old = file_get_contents($htaccess);
 			
-			if (substr($old, $content) === false) {
+			if (strpos($old, $content) === false) {
 				// ****** Write the mod_rewrite rules
 				$hfile = @fopen($htaccess, 'a');
 				if ($hfile) {
